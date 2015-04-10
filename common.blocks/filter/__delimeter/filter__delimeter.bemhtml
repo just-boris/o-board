@@ -1,0 +1,5 @@
+block('filter').elem('delimeter')(
+    mix()(function () {
+        return [{ elem: 'inline-field' }];
+    })
+)

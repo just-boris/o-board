@@ -7,7 +7,8 @@
             'assign-check',
             'label-select',
             'date-input',
-            'inline-field'
+            'inline-field',
+            'delimeter'
         ]},
         { block: 'select', mods: { mode : 'radio-check', theme : 'islands', size : 'm' } },
         { block: 'checkbox', mods:  { theme : 'islands', size : 'm' } },

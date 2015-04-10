@@ -4,7 +4,9 @@ block('filter')(
             { elem: 'repo-select', },
             { elem: 'issue-check' },
             { elem: 'pr-check' },
+            { elem: 'delimeter' },
             { elem: 'assign-check' },
+            { elem: 'delimeter' },
             { elem: 'label-select' },
             { elem: 'date-input' }
         ];
