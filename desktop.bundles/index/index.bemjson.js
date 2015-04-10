@@ -21,7 +21,8 @@ module.exports = {
             },
             {
                 block: 'filter',
-                mix: { block: 'app', elem: 'filter' }
+                mix: { block: 'app', elem: 'filter' },
+                js: true
             },
             // Обязательный элемент блока app,
             // в него будут вставляться таблицы
