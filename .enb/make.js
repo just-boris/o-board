@@ -101,7 +101,7 @@ module.exports = function(config) {
             [techs.browserJs],
             [techs.fileMerge, {
                 target: '?.pre.js',
-                sources: ['?.browser.bemhtml.js', '?.browser.js']
+                sources: ['?.browser.js', '?.browser.bemhtml.js']
             }],
             [techs.prependYm, { source: '?.pre.js' }],
 

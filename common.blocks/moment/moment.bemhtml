@@ -1,3 +1,11 @@
 oninit(function(exports, context) {
-    context.BEMContext.prototype.moment = require('../../libs/moment/moment.js');
+    var moment;
+
+    if (typeof module !== 'undefined' &&  typeof module.exports === 'object') {
+        moment = require('../../libs/moment/moment.js');
+    } else {
+        moment = window.moment;
+    }
+
+    context.BEMContext.prototype.moment = moment;
 });
