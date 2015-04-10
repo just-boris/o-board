@@ -4,12 +4,12 @@ block('app-content').mod('view', 'loading')(
             {
                 block: 'title',
                 mix: { block: this.block, elem: 'spin-title' },
-                mods: { level: 2 },
+                mods: { level: 5 },
                 content: 'Подождите пжл, мы загружаем данные с GitHub...'
             },
             {
                 block: 'spin',
-                mix: { block: 'app', elem: 'spin' },
+                mix: { block: this.block, elem: 'spin' },
                 mods: { theme: 'islands', size: 'xl', visible: true }
             }
         ];

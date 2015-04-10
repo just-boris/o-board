@@ -32,7 +32,7 @@ modules.define('app', ['i-bem__dom', 'BEMHTML'], function (provide, BEMDOM, BEMH
 
                     setTimeout(function () {
                         _this.setMod('state', 'content');
-                    }, 3000);
+                    }, 2000);
                 },
 
                 content: function () {
