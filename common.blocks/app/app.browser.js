@@ -1,10 +1,13 @@
-modules.define('app', ['i-bem__dom', 'BEMHTML'], function (provide, BEMDOM, BEMHTML) {
+modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BEMDOM, BEMHTML, github) {
     'use strict';
     provide(BEMDOM.decl(this.name, {
         onSetMod: {
             js: {
                 inited: function () {
-                    this._config = window.localStorage.getItem('config');
+                    try {
+                        this._config = JSON.parse(window.localStorage.getItem('config'));
+                    } catch(e) {}
+
 
                     this.setMod('state', this._config ? 'loading' : 'config');
                 }
@@ -30,13 +33,19 @@ modules.define('app', ['i-bem__dom', 'BEMHTML'], function (provide, BEMDOM, BEMH
 
                     this._showContent({ block: 'app-content', mods: { view: 'loading' } });
 
-                    setTimeout(function () {
+                    this._getContent().then(function(issues) {
+                        _this._issues = issues;
                         _this.setMod('state', 'content');
-                    }, 2000);
+                    });
+
                 },
 
                 content: function () {
-                    this._showContent({ block: 'app-content', mods: { view: 'content' } });
+                    this._showContent({
+                        block: 'app-content',
+                        mods: { view: 'content' },
+                        issues: this._issues
+                    });
                 }
             }
         },
@@ -46,17 +55,24 @@ modules.define('app', ['i-bem__dom', 'BEMHTML'], function (provide, BEMDOM, BEMH
              * сериализуем форму и сохраняем конфиг,
              * переставляем модификатор в loading
              */
-            window.localStorage.setItem('config', { 'field1': 'val1' });
+            this._config = {
+                token: 'default-token',
+                repositories: [
+                    'allure-framework/allure-core',
+                    'allure-framework/allure-teamcity-plugin'
+                ]
+            };
+            window.localStorage.setItem('config', JSON.stringify(this._config));
 
             this.setMod('state', 'loading');
         },
 
         _getContent: function () {
-            // тратата с аяксом, конфиг в this._config
+            return github.getIssues(this._config.repositories);
         },
 
         _showContent: function(bemjson) {
-            BEMDOM.update(this.elem('content'), BEMHTML.apply(bemjson))
+            BEMDOM.update(this.elem('content'), BEMHTML.apply(bemjson));
         },
 
         _getSpin: function () {

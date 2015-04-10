@@ -1,4 +1,4 @@
-[
+([
     {
         tech: 'js',
         mustDeps: [
@@ -18,8 +18,9 @@
     },
     {
         shouldDeps: [
+            'issues-grid',
             { elems: ['spin-title'] },
             { mods: { view: ['config', 'loading', 'content'] } }
         ]
     }
-]
+]);

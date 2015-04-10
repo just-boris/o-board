@@ -1,3 +1,0 @@
-block('skeleton')(
-    js()(true)
-);

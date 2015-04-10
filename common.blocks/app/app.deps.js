@@ -1,4 +1,4 @@
-[
+([
     {
         tech: 'js',
         mustDeps: [
@@ -9,13 +9,14 @@
             {
                 block: 'app-content',
                 tech: 'bemhtml'
-            }
+            },
         ]
     },
     {
         mustDeps: [
             'app-content',
-            { elems: ['spin', 'btn-config-submit'] }
+            'github',
+            {elems: ['spin', 'btn-config-submit']}
         ]
     }
-]
+]);

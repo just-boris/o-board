@@ -29,29 +29,6 @@ module.exports = {
             // в него будут вставляться таблицы
             {
                 elem: 'content'
-            },
-            {
-                block: 'issues-grid',
-                issues: [{
-                    pullRequest: '//github.com',
-                    url: '//github.com',
-                    organization: 'MyOrganization',
-                    repository: 'MyRepository',
-                    id: '123',
-                    title: 'Issue title',
-                    labels: [{
-                        name: 'label',
-                        color: '#red'
-                    }],
-                    comment: {
-                        author: {
-                            name: 'AuthorName',
-                            url: '//github.com'
-                        },
-                        text: 'commentText',
-                        date: Date.now()
-                    }
-                }]
             }
         ]
     }

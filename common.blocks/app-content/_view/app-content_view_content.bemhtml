@@ -1,5 +1,8 @@
 block('app-content').mod('view', 'content')(
     content()(function () {
-        return 'test content....';
+        return {
+            block: 'issues-grid',
+            issues: this.ctx.issues
+       };
     })
 );
