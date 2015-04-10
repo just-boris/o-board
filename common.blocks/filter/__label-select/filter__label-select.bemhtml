@@ -11,14 +11,9 @@ block('filter').elem('label-select')(
            name : 'label_select',
            val : 2,
            text : 'Filter by label',
-           options : [
-               { val : 1, text : 'label #1' },
-               { val : 2, text : 'label #2' },
-               { val : 3, text : 'label #3' },
-               { val : 4, text : 'label #4' },
-               { val : 5, text : 'label #5' },
-               { val : 6, text : 'label #6' }
-           ]
+           options : this.ctx.content.map(function (item) {
+               return { val: item, text: item };
+           })
         };
     })
 )

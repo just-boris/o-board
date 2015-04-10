@@ -1,13 +1,13 @@
 block('filter')(
     content()(function () {
         return [
-            { elem: 'repo-select', },
+            { elem: 'repo-select', content: this.ctx.repositories || [] },
             { elem: 'issue-check' },
             { elem: 'pr-check' },
             { elem: 'delimeter' },
             { elem: 'assign-check' },
             { elem: 'delimeter' },
-            { elem: 'label-select' },
+            { elem: 'label-select', content: this.ctx.label || [] },
             { elem: 'date-input' }
         ];
     })
