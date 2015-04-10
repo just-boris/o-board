@@ -1,0 +1,11 @@
+block('calendar').elem('grid-head')(
+    tag()('thead'),
+    content()(function() {
+        return {
+            elem: 'row',
+            content: ['mo', 'tu', 'we', 'th', 'fr', 'sa', 'su'].map(function(key) {
+                return { elem: 'day-name', content: key };
+            })
+        };
+    })
+);

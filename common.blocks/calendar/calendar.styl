@@ -1,0 +1,97 @@
+.calendar
+{
+    font-size: 1.5em;
+    margin: 0 auto;
+    position: relative;
+    display: inline-block;
+
+    &__month-select
+    {
+        text-align: center;
+        background-color: #ddf;
+        padding: 0.5em;
+    }
+
+    &__month-switch
+    {
+        position: absolute;
+        background-color: #eef;
+        padding: 0.5em 2em;
+        cursor: pointer;
+
+        &:hover
+        {
+            background-color: #fafaff;
+        }
+
+        &_dest_prev
+        {
+            top: 0;
+            left: 0;
+        }
+
+        &_dest_next
+        {
+            top: 0;
+            right: 0;
+        }
+    }
+
+    &__grid
+    {
+        border-collapse: collapse;
+    }
+
+    &__day-name
+    {
+        padding: 0.5em;
+    }
+
+    &__date
+    {
+        padding: 0.7em 0.5em;
+        border: 0.2em solid transparent;
+        cursor: default;
+    }
+
+    &__day
+    {
+        border: 1px solid transparent;
+        padding: 0;
+        text-align: center;
+
+        &_month_prev,
+        &_month_next
+        {
+            opacity: 0.5;
+        }
+
+        &_weekend
+        {
+            color: #c00;
+        }
+
+        &_selected .calendar__date
+        {
+            border-color: #aad;
+            background-color: #eef;
+        }
+
+        &_today
+        {
+            font-weight: bold;
+
+            .calendar__date
+            {
+                border-color: #666;
+            }
+        }
+
+        &:hover .calendar__date
+        {
+            background-color: #ddf;
+        }
+    }
+}
+
+

@@ -1,0 +1,31 @@
+block('calendar')(
+    js()(function() {
+        var ctx = this.ctx;
+        return {
+            year: ctx.year,
+            month: ctx.month,
+            date: ctx.date
+        };
+    }),
+    content()(function() {
+        var ctx = this.ctx;
+        return {
+            elem: 'content',
+            year: ctx.year,
+            month: ctx.month,
+            date: ctx.date
+        };
+    }),
+    elem('content')(
+        def()(function() {
+            applyNext({ _ctx: this.ctx });
+        }),
+        content()([
+            { elem: 'month-select' },
+            { elem: 'grid' }
+        ])
+    ),
+    elem('row').tag()('tr'),
+    elem('day-name').tag()('th'),
+    elem('day').tag()('td')
+);

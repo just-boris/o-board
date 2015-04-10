@@ -1,0 +1,7 @@
+block('calendar').elem('grid')(
+    tag()('table'),
+    content()([
+        { elem: 'grid-head' },
+        { elem: 'grid-body' }
+    ])
+);

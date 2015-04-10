@@ -12,6 +12,6 @@
         ]},
         { block: 'select', mods: { mode : 'radio-check', theme : 'islands', size : 'm' } },
         { block: 'checkbox', mods:  { theme : 'islands', size : 'm' } },
-        { block: 'input', mods : { theme : 'islands', size : 'm' } }
+        { block: 'input', mods : { theme : 'islands', size : 'm', type : 'datepicker' } }
     ]
 });

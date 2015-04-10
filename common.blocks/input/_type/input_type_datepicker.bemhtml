@@ -1,0 +1,19 @@
+block('input').mod('type', 'datepicker')(
+    content()(function() {
+        return [
+            applyNext(),
+            {
+                block: 'popup',
+                mods: { theme: 'islands', target: 'anchor' },
+                content: {
+                    block: 'calendar',
+                    year: 2014,
+                    month: 11
+                }
+            }
+        ];
+    }),
+    elem('control').attrs()(function() {
+        return this.extend(applyNext(), { readonly: 'readonly' });
+    })
+);

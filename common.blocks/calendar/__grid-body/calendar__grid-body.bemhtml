@@ -1,0 +1,45 @@
+block('calendar').elem('grid-body')(
+    tag()('tbody'),
+    content()(function() {
+        var _ctx = this._ctx,
+            year = _ctx.year,
+            month = _ctx.month - 1,
+            firstDayOfMonth = new Date(year, month, 1).getDay(),
+            now = new Date(),
+            currentDateString = [now.getFullYear(), now.getMonth(), now.getDate()].join('.'),
+            selectedDateString = [year, month, _ctx.date].join('.');
+
+        if (firstDayOfMonth === 0) firstDayOfMonth = 7;
+
+        var daysInMonth = new Date(year, month + 1, 0).getDate(),
+            weekCount = Math.ceil((daysInMonth + firstDayOfMonth - 1) / 7),
+            result = [];
+
+        for (var i = 0; i < weekCount; i++) {
+            var row = [];
+            for (var j = 1; j <= 7; j++) {
+                var date = (i * 7 + j) - firstDayOfMonth + 1,
+                    dateValue = new Date(year, month, date).getDate(),
+                    dateString = [year, month, date].join('.');
+
+                row.push({
+                    elem: 'day',
+                    elemMods: {
+                        'month': date < 1 ? 'prev' : date > daysInMonth ? 'next' : 'current',
+                        'weekend': j > 5,
+                        'today': currentDateString === dateString,
+                        'selected': selectedDateString === dateString
+                    },
+                    js: { date: dateValue },
+                    content: {
+                        elem: 'date',
+                        content: dateValue
+                    }
+                });
+            }
+            result.push({ elem: 'row', content: row });
+        }
+
+        return result;
+    })
+);

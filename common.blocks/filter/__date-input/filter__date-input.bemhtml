@@ -7,7 +7,7 @@ block('filter').elem('date-input')(
     content()(function () {
         return {
             block : 'input',
-            mods : { theme : 'islands', size : 'm' },
+            mods : { theme : 'islands', size : 'm', type: 'datepicker' },
             placeholder : 'дата создания'
         }
     })
