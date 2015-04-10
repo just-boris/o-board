@@ -1,7 +1,7 @@
 //noinspection BadExpressionStatementJS
 module.exports = {
     block: 'page',
-    title: 'Title of the page',
+    title: 'Hello, I am O-board / Github issues dashboard',
     favicon: '/favicon.ico',
     head: [
         { elem: 'meta', attrs: { name: 'description', content: '' } },
@@ -9,17 +9,19 @@ module.exports = {
         { elem: 'css', url: '_index.css' }
     ],
     scripts: [{ elem: 'js', url: '_index.js' }],
-    mods: { theme: 'islands' },
+    mods: { theme: 'o-board' },
     content: {
         // Корневой блок app, в нем вся логика дашборда
         block: 'app',
         content: [
             {
                 block: 'header',
+                mix: { block: 'app', elem: 'header' },
                 title: 'User\'s issues'
             },
             {
-                block: 'filter'
+                block: 'filter',
+                mix: { block: 'app', elem: 'filter' }
             },
             // Обязательный элемент блока app,
             // в него будут вставляться таблицы

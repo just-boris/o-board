@@ -1,0 +1,10 @@
+block('title')(
+    match(function() {
+        var mods = this.ctx.mods;
+
+        return mods && mods.level;
+
+    }).tag()(function () {
+        return 'h' + this.ctx.mods.level;
+    })
+);

@@ -1,11 +1,25 @@
 block('header').content()(function () {
     return [
-        { elem: 'title', content: this.ctx.title },
+        {
+            block: 'title',
+            mix: [
+                {
+                    block: this.block,
+                    elem: 'title'
+                },
+                {
+                    block: 'header',
+                    elem: 'item'
+                }
+            ],
+            mods: {level: 1},
+            content: this.ctx.title
+        },
         {
             block : 'link',
-            mods : { theme : 'islands', size : 'm' },
-            url : './change',
-            content : 'change'
+            mix: { block: 'header', elem: 'item' },
+            mods : { theme : 'islands', size : 'l', pseudo: true },
+            content : 'Change configuration'
         }
     ];
 });
