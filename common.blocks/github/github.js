@@ -20,16 +20,17 @@ modules.define('github', [], function(provide) {
         getIssues: function(repositories) {
             return Promise.all([
                 Promise.all(repositories.map(function(repo) {
+                    var repository = repo.split('/');
                     return fetch(GITHUB_ENDPOINT+'/repos/'+repo+'/issues?direction=desc&sort=updated')
                         .then(fromJSON)
                         .then(function(issues) {
                         return issues.map(function(issue) {
                             return {
-                                repo: repo,
-                                number: issue.number,
+                                id: issue.number,
                                 url: issue.url,
+                                organization: repository[0],
+                                repository: repository[1],
                                 title: issue.title,
-                                commentsCount: issue.comments,
                                 labels: issue.labels,
                                 isPullRequest: !!issue.pull_request
                             };
@@ -43,9 +44,12 @@ modules.define('github', [], function(provide) {
                             return comments.map(function(comment) {
                                 return {
                                     issueUrl: comment.issue_url,
-                                    user: comment.user.login,
-                                    updatedAt: comment.updated_at,
-                                    body: comment.body
+                                    author: {
+                                        login: comment.user.login,
+                                        url: comment.user.html_url
+                                    },
+                                    date: comment.updated_at,
+                                    text: comment.body
                                 };
                             });
                         });
@@ -54,9 +58,9 @@ modules.define('github', [], function(provide) {
                 var issues = data[0],
                     comments = data[1];
                 return issues.map(function(issue) {
-                    issue.comments = comments.filter(function(comment) {
+                    issue.comment = comments.filter(function(comment) {
                         return comment.issueUrl === issue.url;
-                    });
+                    })[0];
                     return issue;
                 });
             });

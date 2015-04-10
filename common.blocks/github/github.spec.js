@@ -138,12 +138,12 @@ modules.define(
                     "issue_url": "https://api.github.com/repos/my-org/core/issues/947",
                     "user": {"login": "aristov"},
                     "updated_at": "2015-04-08T13:50:58Z",
-                    "body": "my comment"
+                    "body": "core latest comment"
                 }, {
                     "issue_url": "https://api.github.com/repos/my-org/core/issues/945",
                     "user": {"login": "aristov"},
                     "updated_at": "2015-04-08T13:50:58Z",
-                    "body": "my comment"
+                    "body": "one of two comments"
                 }, {
                     "issue_url": "https://api.github.com/repos/my-org/core/issues/945",
                     "user": {"login": "aristov"},
@@ -154,7 +154,7 @@ modules.define(
                     "issue_url": "https://api.github.com/repos/my-org/extras/issues/20",
                     "user": {"login": "aristov"},
                     "updated_at": "2015-04-08T13:50:58Z",
-                    "body": "my comment"
+                    "body": "comment from 20"
                 }, {
                     "issue_url": "https://api.github.com/repos/my-org/extras/issues/20",
                     "user": {"login": "aristov"},
@@ -164,13 +164,13 @@ modules.define(
                     "issue_url": "https://api.github.com/repos/my-org/extras/issues/23",
                     "user": {"login": "aristov"},
                     "updated_at": "2015-04-08T13:50:58Z",
-                    "body": "my comment"
+                    "body": "twenty-three"
                 }]);
                 this.expectResponse('repos/my-org/examples/issues/comments?direction=desc&sort=updated', [{
                     "issue_url": "https://api.github.com/repos/my-org/examples/issues/190",
                     "user": {"login": "aristov"},
                     "updated_at": "2015-04-08T13:50:58Z",
-                    "body": "my comment"
+                    "body": "latest comment"
                 }, {
                     "issue_url": "https://api.github.com/repos/my-org/examples/issues/170",
                     "user": {"login": "aristov"},
@@ -184,10 +184,10 @@ modules.define(
                 }]);
                 var result = github.getIssues(['my-org/core', 'my-org/extras', 'my-org/examples']).then(function(results) {
                     expect(results).to.have.length(4);
-                    expect(results[0].comments).to.have.length(1);
-                    expect(results[1].comments).to.have.length(2);
-                    expect(results[2].comments).to.have.length(2);
-                    expect(results[3].comments).to.have.length(1);
+                    expect(results[0]).to.have.deep.property('comment.text', 'core latest comment');
+                    expect(results[1]).to.have.deep.property('comment.text', 'one of two comments');
+                    expect(results[2]).to.have.deep.property('comment.text', 'comment from 20');
+                    expect(results[3]).to.have.deep.property('comment.text', 'twenty-three');
                 });
                 this.server.respond();
                 return result;
