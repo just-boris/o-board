@@ -16,7 +16,7 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
             state: {
                 config: function () {
                     this._showContent({ block: 'app-content', mods: { view: 'config' } });
-                    this._getBtnConfigSubmit().on('click', this._onClickBtnConfigSubmit, this);
+                    //this._getBtnConfigSubmit().on('click', this._onClickBtnConfigSubmit, this);
                 },
 
                 loading: function () {

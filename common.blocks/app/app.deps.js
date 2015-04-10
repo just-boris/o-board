@@ -16,7 +16,7 @@
         mustDeps: [
             'app-content',
             'github',
-            {elems: ['spin', 'btn-config-submit']}
+            { elems: ['btn-config-submit', 'filter', 'form', 'form-field', 'spin'] }
         ]
     }
 ]);
