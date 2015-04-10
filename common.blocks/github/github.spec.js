@@ -185,9 +185,9 @@ modules.define(
                 var result = github.getIssues(['my-org/core', 'my-org/extras', 'my-org/examples']).then(function(results) {
                     expect(results).to.have.length(4);
                     expect(results[0].comments).to.have.length(1);
-                    expect(results[0].comments).to.have.length(2);
-                    expect(results[0].comments).to.have.length(2);
-                    expect(results[0].comments).to.have.length(1);
+                    expect(results[1].comments).to.have.length(2);
+                    expect(results[2].comments).to.have.length(2);
+                    expect(results[3].comments).to.have.length(1);
                 });
                 this.server.respond();
                 return result;
