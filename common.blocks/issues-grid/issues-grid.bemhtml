@@ -1,3 +1,87 @@
 block('issues-grid').content()(function() {
-    return ['Hello, ', this.ctx.name, '!'];
+    return [{
+        elem: 'header',
+        content: [{
+            elem: 'cell',
+            elemMods: { caption: true },
+            content: 'PR'
+        }, {
+            elem: 'cell',
+            elemMods: { caption: true },
+            content: 'Issue'
+        }, {
+            elem: 'cell',
+            elemMods: { caption: true },
+            content: 'Title'
+        }, {
+            elem: 'cell',
+            elemMods: { caption: true },
+            content: 'Labels'
+        }, {
+            elem: 'cell',
+            elemMods: { caption: true },
+            content: 'Last comment'
+        }]
+    }, {
+        elem: 'body',
+        content: this.ctx.issues.map(function(issue) {
+            return {
+                elem: 'issue-row',
+                issue: issue
+            }
+        })
+    }]
+});
+
+block('issues-grid').elem('issue-row').content()(function() {
+    return [{
+        elem: 'pr-cell',
+        mix: { elem: 'cell' },
+        pullRequest: this.ctx.issue.pullRequest
+    }, {
+        elem: 'issue-cell',
+        mix: { elem: 'cell' },
+        url: this.ctx.issue.url,
+        organisation: this.ctx.issue.organization,
+        repository: this.ctx.issue.repository,
+        id: this.ctx.issue.id
+    }, {
+        elem: 'title-cell',
+        mix: { elem: 'cell' },
+        title: this.ctx.issue.title
+    }, {
+        elem: 'labels-cell',
+        mix: { elem: 'cell' },
+        labels: this.ctx.issue.labels
+    }, {
+        elem: 'comment-cell',
+        mix: { elem: 'cell' },
+        comment: this.ctx.issue.comment
+    }]
+});
+
+block('issues-grid').elem('pr-cell')(
+    match(function() {
+        return this.ctx.pullRequest;
+    }).content()(function() {
+        return {
+            block: 'link',
+            url: this.ctx.pullRequest,
+            target: '_blank',
+            content: {
+                block: 'fa',
+                icon: 'code-fork'
+            }
+        }
+    })
+);
+
+block('issues-grid').elem('issue-cell').content()(function() {
+    return {
+        block: 'link',
+        mods: { theme: 'islands', size: 's' },
+        url: this.ctx.url,
+        target: '_blank',
+        content: this.ctx.organization + '/' + this.ctx.repository + '#' + this.ctx.id
+    }
 });

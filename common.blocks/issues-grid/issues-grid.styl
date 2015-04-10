@@ -1,4 +1,33 @@
 .issues-grid
 {
+    display: table;
+}
 
+.issues-grid
+{
+    &__header
+    {
+        display: table-header-group;
+    }
+
+    &__cell
+    {
+        display: table-cell;
+    }
+
+    &__body
+    {
+        display: table-row-group;
+    }
+
+    &__issue-row
+    {
+        display: table-row;
+    }
+
+    &__pr-cell .fa-code-fork
+    {
+        color: #000;
+        font-size: 24px;
+    }
 }

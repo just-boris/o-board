@@ -1,8 +1,10 @@
 /* global modules:false */
 
-modules.define('issues-grid', function(provide) {
+modules.define('issues-grid',
+    ['i-bem__dom'],
+    function(provide, BEMDOM) {
 
-provide();
+        provide(BEMDOM.decl(this.name, {}, {}));
 
-});
+    });
 
