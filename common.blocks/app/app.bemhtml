@@ -1,0 +1,3 @@
+block('app')(
+    js()(true)
+);

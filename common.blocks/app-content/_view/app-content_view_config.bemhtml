@@ -1,0 +1,20 @@
+block('app-content').mod('view', 'config')(
+    content()(function () {
+        return {
+            block: 'form',
+            content: [
+                {
+                    block: 'title',
+                    mods: { level: 1 },
+                    content: 'Введите начальные настройки:'
+                },
+                {
+                    block: 'button',
+                    mix: { block: 'app', elem: 'btn-config-submit' },
+                    mods: { theme: 'islands', size: 'l', type: 'submit', view: 'action' },
+                    text: 'Сохранить и войти'
+                }
+            ]
+        };
+    })
+);
