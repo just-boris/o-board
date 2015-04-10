@@ -41,6 +41,145 @@ module.exports = {
                     title: 'Issue title',
                     labels: [{
                         name: 'label',
+                        color: '#ff0000'
+                    },{
+                        name: 'label2',
+                        color: '#00ff00'
+                    },{
+                        name: 'label3',
+                        color: '#0000ff'
+                    }],
+                    comment: {
+                        author: {
+                            name: 'AuthorName',
+                            url: '//github.com'
+                        },
+                        text: 'commentText',
+                        date: Date.now()
+                    }
+                },{
+                    isPullRequest: true,
+                    url: '//github.com',
+                    organization: 'MyOrganization',
+                    repository: 'MyRepository',
+                    id: '123',
+                    title: 'Issue title',
+                    labels: [{
+                        name: 'label',
+                        color: '#red'
+                    }],
+                    comment: {
+                        author: {
+                            name: 'AuthorName',
+                            url: '//github.com'
+                        },
+                        text: 'commentText',
+                        date: Date.now()
+                    }
+                },{
+                    isPullRequest: true,
+                    url: '//github.com',
+                    organization: 'MyOrganization',
+                    repository: 'MyRepository',
+                    id: '123',
+                    title: 'Issue title',
+                    labels: [{
+                        name: 'label',
+                        color: '#red'
+                    }],
+                    comment: {
+                        author: {
+                            name: 'AuthorName',
+                            url: '//github.com'
+                        },
+                        text: 'commentText',
+                        date: Date.now()
+                    }
+                },{
+                    isPullRequest: true,
+                    url: '//github.com',
+                    organization: 'MyOrganization',
+                    repository: 'MyRepository',
+                    id: '123',
+                    title: 'Issue title',
+                    labels: [{
+                        name: 'label',
+                        color: '#red'
+                    }],
+                    comment: {
+                        author: {
+                            name: 'AuthorName',
+                            url: '//github.com'
+                        },
+                        text: 'commentText',
+                        date: Date.now()
+                    }
+                },{
+                    isPullRequest: true,
+                    url: '//github.com',
+                    organization: 'MyOrganization',
+                    repository: 'MyRepository',
+                    id: '123',
+                    title: 'Issue title',
+                    labels: [{
+                        name: 'label',
+                        color: '#red'
+                    }],
+                    comment: {
+                        author: {
+                            name: 'AuthorName',
+                            url: '//github.com'
+                        },
+                        text: 'commentText',
+                        date: Date.now()
+                    }
+                },{
+                    isPullRequest: true,
+                    url: '//github.com',
+                    organization: 'MyOrganization',
+                    repository: 'MyRepository',
+                    id: '123',
+                    title: 'Issue title',
+                    labels: [{
+                        name: 'label',
+                        color: '#red'
+                    }],
+                    comment: {
+                        author: {
+                            name: 'AuthorName',
+                            url: '//github.com'
+                        },
+                        text: 'commentText',
+                        date: Date.now()
+                    }
+                },{
+                    isPullRequest: true,
+                    url: '//github.com',
+                    organization: 'MyOrganization',
+                    repository: 'MyRepository',
+                    id: '123',
+                    title: 'Issue title',
+                    labels: [{
+                        name: 'label',
+                        color: '#red'
+                    }],
+                    comment: {
+                        author: {
+                            name: 'AuthorName',
+                            url: '//github.com'
+                        },
+                        text: 'commentText',
+                        date: Date.now()
+                    }
+                },{
+                    isPullRequest: true,
+                    url: '//github.com',
+                    organization: 'MyOrganization',
+                    repository: 'MyRepository',
+                    id: '123',
+                    title: 'Issue title',
+                    labels: [{
+                        name: 'label',
                         color: '#red'
                     }],
                     comment: {

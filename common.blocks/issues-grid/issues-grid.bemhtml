@@ -1,27 +1,30 @@
 block('issues-grid').content()(function() {
     return [{
         elem: 'header',
-        content: [{
-            elem: 'cell',
-            elemMods: {caption: true},
-            content: 'PR'
-        }, {
-            elem: 'cell',
-            elemMods: {caption: true},
-            content: 'Issue'
-        }, {
-            elem: 'cell',
-            elemMods: {caption: true},
-            content: 'Title'
-        }, {
-            elem: 'cell',
-            elemMods: {caption: true},
-            content: 'Labels'
-        }, {
-            elem: 'cell',
-            elemMods: {caption: true},
-            content: 'Last comment'
-        }]
+        content: {
+            elem: 'row',
+            content: [{
+                elem: 'cell',
+                elemMods: { header: true },
+                content: 'PR'
+            }, {
+                elem: 'cell',
+                elemMods: { header: true },
+                content: 'Issue'
+            }, {
+                elem: 'cell',
+                elemMods: { header: true },
+                content: 'Title'
+            }, {
+                elem: 'cell',
+                elemMods: { header: true },
+                content: 'Labels'
+            }, {
+                elem: 'cell',
+                elemMods: { header: true },
+                content: 'Last comment'
+            }]
+        }
     }, {
         elem: 'body',
         content: this.ctx.issues.map(function(issue) {
@@ -40,22 +43,22 @@ block('issues-grid').elem('issue-row').content()(function() {
         isPullRequest: this.ctx.issue.isPullRequest
     }, {
         elem: 'issue-cell',
-        mix: {elem: 'cell'},
+        mix: { elem: 'cell' },
         url: this.ctx.issue.url,
         organization: this.ctx.issue.organization,
         repository: this.ctx.issue.repository,
         id: this.ctx.issue.id
     }, {
         elem: 'title-cell',
-        mix: {elem: 'cell'},
+        mix: { elem: 'cell' },
         title: this.ctx.issue.title
     }, {
         elem: 'labels-cell',
-        mix: {elem: 'cell'},
+        mix: { elem: 'cell' },
         labels: this.ctx.issue.labels
     }, {
         elem: 'comment-cell',
-        mix: {elem: 'cell'},
+        mix: { elem: 'cell' },
         comment: this.ctx.issue.comment
     }];
 });
@@ -74,7 +77,7 @@ block('issues-grid').elem('pr-cell')(
 block('issues-grid').elem('issue-cell').content()(function() {
     return {
         block: 'link',
-        mods: {theme: 'islands', size: 's'},
+        mods: { theme: 'islands', size: 's' },
         url: this.ctx.url,
         target: '_blank',
         content: this.ctx.organization + '/' + this.ctx.repository + '#' + this.ctx.id
@@ -88,7 +91,7 @@ block('issues-grid').elem('title-cell').content()(function() {
 block('issues-grid').elem('comment-cell').content()(function() {
     return [{
         block: 'link',
-        mods: {theme: 'islands'},
+        mods: { theme: 'islands' },
         url: this.ctx.comment.author.url,
         target: '_blank',
         content: '@' + this.ctx.comment.author.login
@@ -122,6 +125,15 @@ block('issues-grid').elem('comment-cell').content()(function() {
         mods: { theme: 'islands', size: 's' },
         url: this.ctx.comment.author.url,
         content: this.xmlEscape('<' + this.ctx.comment.author.name + '>')
-    }, this.moment(this.ctx.comment.date).fromNow()]
+    }, ' ', this.moment(this.ctx.comment.date).fromNow()]
 });
 
+block('issues-grid').elem('label')(
+    tag()('span'),
+    attrs()(function() {
+        return { style: 'border-color: ' + this.ctx.label.color + ';' }
+    }),
+    content()(function() {
+        return this.ctx.label.name;
+    })
+);
