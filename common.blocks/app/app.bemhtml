@@ -1,0 +1,10 @@
+block('app')(
+    js()(true),
+    content()(function () {
+        return [
+            // ..header
+            { elem: 'content' }
+            // ..footer
+        ]
+    })
+);

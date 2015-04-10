@@ -1,5 +1,5 @@
 //noinspection BadExpressionStatementJS
-({
+module.exports = {
     block: 'page',
     title: 'Title of the page',
     favicon: '/favicon.ico',
@@ -10,25 +10,22 @@
     ],
     scripts: [{ elem: 'js', url: '_index.js' }],
     mods: { theme: 'islands' },
-    content: [
-        {
-            block: 'header',
-            title: 'User\'s issues'
-        },
-        {
-            block: 'filter'
-        },
-        {
-            block: 'content',
-            content: [
-                //{
-                //    block: 'spin',
-                //    mods: { theme: 'islands', size: 'm', visible: true }
-                //},
-                //{
-                //    block: 'issues-grid'
-                //}
-            ]
-        }
-    ]
-});
+    content: {
+        // Корневой блок app, в нем вся логика дашборда
+        block: 'app',
+        content: [
+            {
+                block: 'header',
+                title: 'User\'s issues'
+            },
+            {
+                block: 'filter'
+            },
+            // Обязательный элемент блока app,
+            // в него будут вставляться таблицы
+            {
+                elem: 'content'
+            }
+        ]
+    }
+};
