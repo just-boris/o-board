@@ -1,4 +1,7 @@
 ({
+    mustDeps: [
+        { block: 'moment' }
+    ],
     shouldDeps: [
         { block: 'icon' },
         { block: 'fa' },

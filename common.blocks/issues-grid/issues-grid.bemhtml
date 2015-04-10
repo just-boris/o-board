@@ -36,8 +36,8 @@ block('issues-grid').content()(function() {
 block('issues-grid').elem('issue-row').content()(function() {
     return [{
         elem: 'pr-cell',
-        mix: {elem: 'cell'},
-        pullRequest: this.ctx.issue.pullRequest
+        mix: { elem: 'cell' },
+        isPullRequest: this.ctx.issue.isPullRequest
     }, {
         elem: 'issue-cell',
         mix: {elem: 'cell'},
@@ -62,17 +62,12 @@ block('issues-grid').elem('issue-row').content()(function() {
 
 block('issues-grid').elem('pr-cell')(
     match(function() {
-        return this.ctx.pullRequest;
+        return this.ctx.isPullRequest;
     }).content()(function() {
         return {
-            block: 'link',
-            url: this.ctx.pullRequest,
-            target: '_blank',
-            content: {
-                block: 'fa',
-                icon: 'code-fork'
-            }
-        };
+            block: 'fa',
+            icon: 'code-fork'
+        }
     })
 );
 
@@ -103,3 +98,30 @@ block('issues-grid').elem('comment-cell').content()(function() {
         content: moment(this.ctx.comment.date).fromNow()
     }];
 });
+
+block('issues-grid').elem('title-cell').content()(function() {
+    return this.ctx.title;
+});
+
+block('issues-grid').elem('labels-cell').content()(function() {
+    return this.ctx.labels.map(function(label) {
+        return {
+            elem: 'label',
+            label: label
+        }
+    })
+});
+
+block('issues-grid').elem('label').content()(function() {
+    return this.ctx.label.name;
+});
+
+block('issues-grid').elem('comment-cell').content()(function() {
+    return [{
+        block: 'link',
+        mods: { theme: 'islands', size: 's' },
+        url: this.ctx.comment.author.url,
+        content: this.xmlEscape('<' + this.ctx.comment.author.name + '>')
+    }, this.moment(this.ctx.comment.date).fromNow()]
+});
+
