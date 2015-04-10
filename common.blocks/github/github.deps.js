@@ -1,0 +1,8 @@
+//noinspection BadExpressionStatementJS
+({
+    mustDeps : [
+        'fetch'
+    ]
+})
+
+

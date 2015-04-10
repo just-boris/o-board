@@ -21,8 +21,11 @@
             block : 'content',
             content : [
                 {
-                    block : 'spin',
-                    mods : { theme : 'islands', size : 'm', visible : true }
+                    block: 'skeleton',
+                    content: [{
+                        block : 'spin',
+                        mods : { theme : 'islands', size : 'm', visible : true }
+                    }]
                 }
             ]
         },
@@ -33,4 +36,4 @@
             ]
         }
     ]
-})
+});
