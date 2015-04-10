@@ -10,13 +10,19 @@
     ],
     scripts: [{ elem : 'js', url : '_index.js' }],
     mods : { theme : 'islands' },
-    content : [{
-        block : 'content',
-        content : [
-            {
-                block : 'spin',
-                mods : { theme : 'islands', size : 'm', visible : true }
-            }
-        ]
-    }]
+    content : [
+        {
+            block: 'header',
+            title: 'User\'s issues'
+        },
+        {
+            block : 'content',
+            content : [
+                {
+                    block : 'spin',
+                    mods : { theme : 'islands', size : 'm', visible : true }
+                }
+            ]
+        }
+    ]
 });

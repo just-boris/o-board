@@ -1,0 +1,11 @@
+block('header').content()(function () {
+    return [
+        { elem: 'title', content: this.ctx.title },
+        {
+            block : 'link',
+            mods : { theme : 'islands', size : 'm' },
+            url : './change',
+            content : 'change'
+        }
+    ];
+});
