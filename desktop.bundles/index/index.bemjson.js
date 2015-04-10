@@ -1,4 +1,3 @@
-//noinspection BadExpressionStatementJS
 ({
     block : 'page',
     title : 'Title of the page',
@@ -10,27 +9,5 @@
     ],
     scripts: [{ elem : 'js', url : '_index.js' }],
     mods : { theme : 'islands' },
-    content : [
-        {
-            block : 'header',
-            content : [
-                {tag: 'h1', content: 'Issue browser'}
-            ]
-        },
-        {
-            block : 'content',
-            content : [
-                {
-                    block : 'spin',
-                    mods : { theme : 'islands', size : 'm', visible : true }
-                }
-            ]
-        },
-        {
-            block : 'footer',
-            content : [
-                'Use us on your risk! And enjoy'
-            ]
-        }
-    ]
+    content : []
 })
