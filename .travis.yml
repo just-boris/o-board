@@ -4,4 +4,4 @@ node_js:
 
 script:
   - "node_modules/.bin/enb make"
-  - "node_modules/.bin/enb specs"
+  - "node_modules/.bin/enb make specs"
