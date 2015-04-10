@@ -1,0 +1,8 @@
+{
+    "freeze_paths" : {
+        "**/*.svg": ":encodeURIComponent:",
+        "**/*.png": ":base64:",
+        "**/*.jpg": ":base64:",
+        "**/*.gif": ":base64:"
+    }
+}
