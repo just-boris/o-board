@@ -1,6 +1,6 @@
 //noinspection BadExpressionStatementJS
 ({
     mustDeps : [
-        'fetch'
+        'es6-promise'
     ]
 });
