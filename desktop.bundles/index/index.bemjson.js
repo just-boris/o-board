@@ -10,30 +10,13 @@
     ],
     scripts: [{ elem : 'js', url : '_index.js' }],
     mods : { theme : 'islands' },
-    content : [
-        {
-            block : 'header',
-            content : [
-                {tag: 'h1', content: 'Issue browser'}
-            ]
-        },
-        {
-            block : 'content',
-            content : [
-                {
-                    block: 'skeleton',
-                    content: [{
-                        block : 'spin',
-                        mods : { theme : 'islands', size : 'm', visible : true }
-                    }]
-                }
-            ]
-        },
-        {
-            block : 'footer',
-            content : [
-                'Use us on your risk! And enjoy'
-            ]
-        }
-    ]
+    content : [{
+        block : 'content',
+        content : [
+            {
+                block : 'spin',
+                mods : { theme : 'islands', size : 'm', visible : true }
+            }
+        ]
+    }]
 });
