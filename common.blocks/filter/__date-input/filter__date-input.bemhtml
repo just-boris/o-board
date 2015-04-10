@@ -1,0 +1,14 @@
+block('filter').elem('date-input')(
+
+    mix()(function () {
+        return [{ elem: 'inline-field' }];
+    }),
+
+    content()(function () {
+        return {
+            block : 'input',
+            mods : { theme : 'islands', size : 'm' },
+            placeholder : 'дата создания'
+        }
+    })
+)

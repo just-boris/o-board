@@ -1,0 +1,12 @@
+block('filter')(
+    content()(function () {
+        return [
+            { elem: 'repo-select', },
+            { elem: 'issue-check' },
+            { elem: 'pr-check' },
+            { elem: 'assign-check' },
+            { elem: 'label-select' },
+            { elem: 'date-input' }
+        ];
+    })
+);

@@ -1,0 +1,24 @@
+block('filter').elem('repo-select')(
+
+    mix()(function () {
+        return [{ elem: 'inline-field' }];
+    }),
+
+    content()(function () {
+        return {
+           block : 'select',
+           mods : { mode : 'radio-check', theme : 'islands', size : 'm' },
+           name : 'repo_select',
+           val : 2,
+           text : 'Select repositories',
+           options : [
+               { val : 1, text : 'репозиторий #1' },
+               { val : 2, text : 'репозиторий #2' },
+               { val : 3, text : 'репозиторий #3' },
+               { val : 4, text : 'репозиторий #4' },
+               { val : 5, text : 'репозиторий #5' },
+               { val : 6, text : 'репозиторий #6' }
+           ]
+        };
+    })
+);

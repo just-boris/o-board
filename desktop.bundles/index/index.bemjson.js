@@ -16,14 +16,18 @@
             title: 'User\'s issues'
         },
         {
+            block: 'filter'
+        },
+        {
             block: 'content',
             content: [
-                {
-                    block: 'spin',
-                    mods: { theme: 'islands', size: 'm', visible: true }
-                }, {
-                    block: 'issues-grid'
-                }
+                //{
+                //    block: 'spin',
+                //    mods: { theme: 'islands', size: 'm', visible: true }
+                //},
+                //{
+                //    block: 'issues-grid'
+                //}
             ]
         }
     ]
