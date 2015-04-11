@@ -98,7 +98,7 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
         },
 
         _getContent: function () {
-            return github.getIssues(this._config.repositories, {token: this.config.token});
+            return github.getIssues(this._config.repositories, {token: this._config.token});
         },
 
         _showContent: function(bemjson) {
