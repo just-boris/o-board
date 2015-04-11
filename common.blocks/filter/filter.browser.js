@@ -14,7 +14,8 @@ modules.define('filter', ['i-bem__dom'], function (provide, BEMDOM) {
                             item.on('change', this._onChange, this)
                         }, this);
 
-                    ['issue-check', 'pr-check', 'assign-check']
+                    //['issue-check', 'pr-check', 'assign-check']
+                    ['issue-check', 'pr-check']
                         .map(function (item) {
                             return this.findBlockInside(item, 'checkbox');
                         }, this)
@@ -35,7 +36,7 @@ modules.define('filter', ['i-bem__dom'], function (provide, BEMDOM) {
                 checkboxElems = [
                     ['issue-check', 'issues'],
                     ['pr-check', 'pullRequests'],
-                    ['assign-check', 'assignToMe']
+                    //['assign-check', 'assignToMe']
                 ],
                 values = selectElems
                     .map(function (item) {
@@ -63,7 +64,8 @@ modules.define('filter', ['i-bem__dom'], function (provide, BEMDOM) {
                         return prev;
                     }, {});
 
-                console.log('filter data: ' + JSON.stringify(values));
+                var strValues = JSON.stringify(values);
+                console.log('filter data: ' + strValues);
                 this.emit('change', values);
         }
     }));

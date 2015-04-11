@@ -10,8 +10,8 @@ block('filter')(
             { elem: 'issue-check' },
             { elem: 'pr-check' },
             { elem: 'delimeter' },
-            { elem: 'assign-check' },
-            { elem: 'delimeter' },
+            //{ elem: 'assign-check' },
+            //{ elem: 'delimeter' },
             //{ elem: 'label-select', content: this.ctx.label || [] },
             { elem: 'date-input' }
         ];
