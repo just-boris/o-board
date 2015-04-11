@@ -23,7 +23,7 @@ block('app-content').mod('view', 'content')(
                     content: [{ block: 'fa', icon: 'dot-circle-o' }, ' Unanswered']
                 },{
                     block: 'issues-grid',
-                    issues: this.ctx.issues
+                    issues: this.ctx.issues.unanswered
                 },{
                     elem: 'title',
                     tag: 'h2',
@@ -31,7 +31,7 @@ block('app-content').mod('view', 'content')(
                     content: [{ block: 'fa', icon: 'dot-circle-o' }, ' Waiting for feedback']
                 },{
                     block: 'issues-grid',
-                    issues: this.ctx.issues
+                    issues: this.ctx.issues.answered
                 }
             ];
         })
