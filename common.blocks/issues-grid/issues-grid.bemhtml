@@ -154,7 +154,7 @@ block('issues-grid').elem('comment-cell').match(function() {
         block: 'link',
         mods: { theme: 'islands', size: 's' },
         url: this.ctx.comment.author.url,
-        content: this.xmlEscape('<' + this.ctx.comment.author.name + '>')
+        content: this.xmlEscape('<' + this.ctx.comment.author.login + '>')
     }, ' ', this.moment(this.ctx.comment.date).fromNow()]
 });
 
