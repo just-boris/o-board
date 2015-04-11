@@ -1,21 +1,29 @@
 modules.define('github__backend', function(provide) {
     "use strict";
-    var GITHUB_ENDPOINT = 'http://api.github.com';
+    var GITHUB_ENDPOINT = 'https://api.github.com';
     provide({
-        fromJSON: function(response) {
+        _fromJSON: function(response) {
             return response.json();
         },
-        getRepos: function(organization) {
-            return fetch(GITHUB_ENDPOINT+'/users/'+organization+'/repos')
-                .then(this.fromJSON);
+        _getAuthHeader: function(token) {
+            return {
+                'Authorization': 'Basic ' + btoa(token+':x-oauth-basic')
+            };
         },
-        getIssues: function(repo) {
-            return fetch(GITHUB_ENDPOINT+'/repos/'+repo+'/issues?direction=desc&sort=updated')
-                .then(this.fromJSON);
+        getRepos: function(organization, options) {
+            return fetch(GITHUB_ENDPOINT+'/users/'+organization+'/repos', {
+                headers: this._getAuthHeader(options.token)
+            }).then(this._fromJSON);
         },
-        getComments: function(repo) {
-            return fetch(GITHUB_ENDPOINT+'/repos/'+repo+'/issues/comments?direction=desc&sort=updated')
-                .then(this.fromJSON);
+        getIssues: function(repo, options) {
+            return fetch(GITHUB_ENDPOINT+'/repos/'+repo+'/issues?direction=desc&sort=updated', {
+                headers: this._getAuthHeader(options.token)
+            }).then(this._fromJSON);
+        },
+        getComments: function(repo, options) {
+            return fetch(GITHUB_ENDPOINT+'/repos/'+repo+'/issues/comments?direction=desc&sort=updated', {
+                headers: this._getAuthHeader(options.token)
+            }).then(this._fromJSON);
         }
     });
 });
