@@ -15,12 +15,12 @@ block('issues-grid').content()(function() {
                 content: 'PR'
             }, {
                 elem: 'cell',
-                attrs: { 'data-key': 'issue' },
                 elemMods: { header: true, sorter: true },
+                key: 'issue',
                 content: 'Issue'
             }, {
                 elem: 'cell',
-                attrs: { 'data-key': 'title' },
+                key: 'title',
                 elemMods: { header: true, sorter: true },
                 content: 'Title'
             }, {
@@ -29,7 +29,7 @@ block('issues-grid').content()(function() {
                 content: 'Labels'
             }, {
                 elem: 'cell',
-                attrs: { 'data-key': 'comment' },
+                key: 'comment',
                 elemMods: { header: true, sorter: true },
                 content: 'Last comment'
             }]
@@ -53,6 +53,7 @@ block('issues-grid').elem('cell').elemMod('header', true).elemMod('sorter', true
     }, {
         elem: 'sorter',
         tag: 'span',
+        attrs: { 'data-key': this.ctx.key },
         content: {
             block: 'fa',
             icon: 'angle-down'
