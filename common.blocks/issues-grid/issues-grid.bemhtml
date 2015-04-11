@@ -1,5 +1,7 @@
-block('issues-grid').js()({
-    issues: this.ctx.issues
+block('issues-grid').js()(function() {
+    return {
+        issues: this.ctx.issues
+    }
 });
 
 block('issues-grid').content()(function() {
@@ -59,8 +61,6 @@ block('issues-grid').elem('cell').elemMod('header', true).elemMod('sorter', true
 });
 
 block('issues-grid').elem('issue-row').content()(function() {
-    console.log('this.ctx.issue', this.ctx.issue);
-
     return [{
         elem: 'pr-cell',
         mix: { elem: 'cell' },
@@ -113,19 +113,21 @@ block('issues-grid').elem('title-cell').content()(function() {
 });
 
 block('issues-grid').elem('comment-cell')
-    .match(function () { return this.ctx.comment; }).content()(function() {
-        return [{
-            block: 'link',
-            mods: { theme: 'islands' },
-            url: this.ctx.comment.author.url,
-            target: '_blank',
-            content: '@' + this.ctx.comment.author.login
-        }, ' ', {
-            tag: 'span',
-            title: moment(this.ctx.comment.date).format(),
-            content: moment(this.ctx.comment.date).fromNow()
-        }];
-    });
+    .match(function() {
+        return this.ctx.comment;
+    }).content()(function() {
+    return [{
+        block: 'link',
+        mods: { theme: 'islands' },
+        url: this.ctx.comment.author.url,
+        target: '_blank',
+        content: '@' + this.ctx.comment.author.login
+    }, ' ', {
+        tag: 'span',
+        title: moment(this.ctx.comment.date).format(),
+        content: moment(this.ctx.comment.date).fromNow()
+    }];
+});
 
 block('issues-grid').elem('title-cell').content()(function() {
     return this.ctx.title;
@@ -144,7 +146,9 @@ block('issues-grid').elem('label').content()(function() {
     return this.ctx.label.name;
 });
 
-block('issues-grid').elem('comment-cell').match(function () { return this.ctx.comment; }).content()(function() {
+block('issues-grid').elem('comment-cell').match(function() {
+    return this.ctx.comment;
+}).content()(function() {
     return [{
         block: 'link',
         mods: { theme: 'islands', size: 's' },
