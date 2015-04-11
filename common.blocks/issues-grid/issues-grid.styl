@@ -2,8 +2,6 @@
 {
     display: table;
 
-    width: 80%;
-
     border-collapse: collapse;
 
     border: 1px solid #e5e5e5;
@@ -77,6 +75,16 @@
         width: 10%;
     }
 
+    &__issue-cell
+    {
+        min-width: 150px;
+    }
+
+    &__comment-cell
+    {
+        min-width: 200px;
+    }
+
     &__label
     {
         display: inline-block;
@@ -96,5 +104,18 @@
     &__sorter_loading .fa
     {
         display: none;
+    }
+
+    &__user .image
+    {
+        vertical-align: middle;
+
+        border-radius: 50px;
+    }
+
+    &__user &__login
+    {
+        margin-left: 5px;
+        vertical-align: middle;
     }
 }

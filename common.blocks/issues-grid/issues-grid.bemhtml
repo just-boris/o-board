@@ -151,11 +151,20 @@ block('issues-grid').elem('comment-cell').match(function() {
     return this.ctx.comment;
 }).content()(function() {
     return [{
+        block: 'issues-grid',
+        elem: 'user',
+        avatar: this.ctx.comment.author.avatarUrl,
+        login: this.ctx.comment.author.login,
+        url: this.ctx.comment.author.url
+    }, {
         block: 'link',
         mods: { theme: 'islands', size: 's' },
-        url: this.ctx.comment.author.issueUrl,
-        content: this.xmlEscape('<' + this.ctx.comment.author.login + '>')
-    }, ' ', this.moment(this.ctx.comment.date).fromNow()]
+        url: this.ctx.comment.issueUrl,
+        content: {
+            elem: 'date',
+            content: this.moment(this.ctx.comment.date).fromNow()
+        }
+    }]
 });
 
 block('issues-grid').elem('label')(
@@ -165,5 +174,25 @@ block('issues-grid').elem('label')(
     }),
     content()(function() {
         return this.ctx.label.name;
+    })
+);
+
+block('issues-grid').elem('user')(
+    content()(function() {
+        return [{
+            block: 'image',
+            url: this.ctx.avatar,
+            width: 24,
+            height: 24
+        }, {
+            elem: 'login',
+            tag: 'span',
+            content: {
+                block: 'link',
+                mods: { theme: 'islands', size: 's' },
+                url: this.ctx.url,
+                content: this.ctx.login
+            }
+        }]
     })
 );
