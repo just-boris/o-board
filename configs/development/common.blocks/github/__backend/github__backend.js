@@ -115,49 +115,49 @@ modules.define('github__backend', function(provide, backend) {
         var comments = {
             'my-org/core': [{
                 "issue_url": "https://api.github.com/repos/my-org/core/issues/947",
-                "user": {"login": "aristov"},
+                "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
                 "updated_at": "2015-04-08T0:50:58Z",
                 "body": "core latest comment"
             }, {
                 "issue_url": "https://api.github.com/repos/my-org/core/issues/945",
-                "user": {"login": "aristov"},
+                "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
                 "updated_at": "2015-04-08T1:50:58Z",
                 "body": "one of two comments"
             }, {
                 "issue_url": "https://api.github.com/repos/my-org/core/issues/945",
-                "user": {"login": "aristov"},
+                "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
                 "updated_at": "2015-04-08T2:50:58Z",
                 "body": "my comment"
             }],
             'my-org/extras': [{
                 "issue_url": "https://api.github.com/repos/my-org/extras/issues/20",
-                "user": {"login": "aristov"},
+                "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
                 "updated_at": "2015-04-08T3:50:58Z",
                 "body": "comment from 20"
             }, {
                 "issue_url": "https://api.github.com/repos/my-org/extras/issues/20",
-                "user": {"login": "aristov"},
+                "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
                 "updated_at": "2015-04-08T4:50:58Z",
                 "body": "my comment"
             }, {
                 "issue_url": "https://api.github.com/repos/my-org/extras/issues/23",
-                "user": {"login": "aristov"},
+                "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
                 "updated_at": "2015-04-08T5:50:58Z",
                 "body": "twenty-three"
             }],
             'my-org/examples': [{
                 "issue_url": "https://api.github.com/repos/my-org/examples/issues/190",
-                "user": {"login": "aristov"},
+                "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
                 "updated_at": "2015-04-08T6:50:58Z",
                 "body": "latest comment"
             }, {
                 "issue_url": "https://api.github.com/repos/my-org/examples/issues/170",
-                "user": {"login": "aristov"},
+                "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
                 "updated_at": "2015-04-08T7:50:58Z",
                 "body": "my comment"
             }, {
                 "issue_url": "https://api.github.com/repos/my-org/examples/issues/145",
-                "user": {"login": "aristov"},
+                "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
                 "updated_at": "2015-04-08T8:50:58Z",
                 "body": "my comment"
             }]

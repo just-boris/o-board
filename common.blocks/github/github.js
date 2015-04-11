@@ -40,6 +40,7 @@ modules.define('github', ['github__backend'], function(provide, backend) {
                                 issueUrl: comment.issue_url,
                                 author: {
                                     login: comment.user.login,
+                                    avatarUrl: comment.user.avatar_url,
                                     url: comment.user.html_url
                                 },
                                 date: comment.updated_at,
