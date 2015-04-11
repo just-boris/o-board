@@ -29,9 +29,9 @@ block('issues-grid').content()(function() {
                 content: 'Labels'
             }, {
                 elem: 'cell',
-                key: 'comment',
+                key: 'activity',
                 elemMods: { header: true, sorter: true },
-                content: 'Last comment'
+                content: 'Last activity'
             }]
         }
     }, {
@@ -90,7 +90,7 @@ block('issues-grid').elem('issue-row')(
         }, {
             elem: 'comment-cell',
             mix: { elem: 'cell' },
-            comment: this.ctx.issue.comment
+            lastActivity: this.ctx.issue.lastActivity
         }];
     }));
 
@@ -119,27 +119,6 @@ block('issues-grid').elem('title-cell').content()(function() {
     return this.ctx.title;
 });
 
-block('issues-grid').elem('comment-cell')
-    .match(function() {
-        return this.ctx.comment;
-    }).content()(function() {
-    return [{
-        block: 'link',
-        mods: { theme: 'islands' },
-        url: this.ctx.comment.author.url,
-        target: '_blank',
-        content: '@' + this.ctx.comment.author.login
-    }, ' ', {
-        tag: 'span',
-        title: moment(this.ctx.comment.date).format(),
-        content: moment(this.ctx.comment.date).fromNow()
-    }];
-});
-
-block('issues-grid').elem('title-cell').content()(function() {
-    return this.ctx.title;
-});
-
 block('issues-grid').elem('labels-cell').content()(function() {
     return this.ctx.labels.map(function(label) {
         return [{
@@ -150,22 +129,30 @@ block('issues-grid').elem('labels-cell').content()(function() {
 });
 
 block('issues-grid').elem('comment-cell').match(function() {
-    return this.ctx.comment;
+    return this.ctx.lastActivity;
 }).content()(function() {
     return [{
         block: 'issues-grid',
         elem: 'user',
-        avatar: this.ctx.comment.author.avatarUrl,
-        login: this.ctx.comment.author.login,
-        url: this.ctx.comment.author.url
+        avatar: this.ctx.lastActivity.author.avatarUrl,
+        login: '@' + this.ctx.lastActivity.author.login,
+        url: this.ctx.lastActivity.author.url
+    }, {
+        block: 'issues-grid',
+        elem: 'type',
+        type: this.ctx.lastActivity.type
     }, {
         block: 'link',
         mods: { theme: 'islands', size: 's' },
-        url: this.ctx.comment.issueUrl,
+        url: this.ctx.lastActivity.issueUrl,
         content: {
             elem: 'date',
             tag: 'span',
-            content: ' ' + this.moment(this.ctx.comment.date).fromNow()
+            content: [{
+                tag: 'span',
+                title: moment(this.ctx.lastActivity.date).format(),
+                content: moment(this.ctx.lastActivity.date).fromNow()
+            }]
         }
     }]
 });
@@ -198,5 +185,27 @@ block('issues-grid').elem('user')(
                 content: this.ctx.login
             }
         }]
+    })
+);
+
+block('issues-grid').elem('type')(
+    tag()('span'),
+    content()(function() {
+        var message = '';
+        switch (this.ctx.type) {
+            case 'comment':
+                message = 'commented';
+                break;
+            case 'create':
+                message = 'create issue';
+                break;
+            case 'commit':
+                message = 'push commit';
+                break;
+            case 'pull':
+                message = 'make pull request';
+                break;
+        }
+        return message ? ' ' + message + ' ' : ''
     })
 );

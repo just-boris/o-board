@@ -54,7 +54,7 @@ modules.define('issues-grid',
                     case 'title':
                         sorter = this._titleSorter;
                         break;
-                    case 'comment':
+                    case 'activity':
                         sorter = this._commentsSorter;
                         break;
                 }
@@ -90,7 +90,7 @@ modules.define('issues-grid',
             },
 
             _commentsSorter: function(left, right) {
-                return moment(left.comment.date).valueOf() > moment(right.comment.date).valueOf();
+                return moment(left.lastActivity.date).valueOf() > moment(right.lastActivity.date).valueOf();
             },
 
             _issueSorter: function(left, right) {
