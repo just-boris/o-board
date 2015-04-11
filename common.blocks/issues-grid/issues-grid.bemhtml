@@ -136,15 +136,11 @@ block('issues-grid').elem('title-cell').content()(function() {
 
 block('issues-grid').elem('labels-cell').content()(function() {
     return this.ctx.labels.map(function(label) {
-        return {
+        return [{
             elem: 'label',
             label: label
-        }
+        }, ' ']
     })
-});
-
-block('issues-grid').elem('label').content()(function() {
-    return this.ctx.label.name;
 });
 
 block('issues-grid').elem('comment-cell').match(function() {
@@ -171,7 +167,7 @@ block('issues-grid').elem('comment-cell').match(function() {
 block('issues-grid').elem('label')(
     tag()('span'),
     attrs()(function() {
-        return { style: 'border-color: ' + this.ctx.label.color + ';' }
+        return { style: 'background-color: #' + this.ctx.label.color + ';' }
     }),
     content()(function() {
         return this.ctx.label.name;
