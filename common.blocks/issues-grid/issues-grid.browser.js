@@ -47,6 +47,12 @@ modules.define('issues-grid',
                     sorter = null;
 
                 switch (key) {
+                    case 'issue':
+                        sorter = this._issueSorter;
+                        break;
+                    case 'title':
+                        sorter = this._titleSorter;
+                        break;
                     case 'comment':
                         sorter = this._commentsSorter;
                         break;
@@ -84,6 +90,17 @@ modules.define('issues-grid',
 
             _commentsSorter: function(left, right) {
 
+            },
+
+            _issueSorter: function(left, right) {
+                var issueLeft = left.organization + left.repository + left.id,
+                    issueRight = right.organization + right.repository + right.id;
+
+                return issueLeft > issueRight;
+            },
+
+            _titleSorter: function(left, right) {
+                return left.title > right.title;
             }
         }, {
 
