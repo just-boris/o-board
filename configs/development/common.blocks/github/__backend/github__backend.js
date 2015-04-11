@@ -74,6 +74,7 @@ modules.define('github__backend', function(provide, backend) {
                         "color": "d4c5f9"
                     }],
                     "state": "open",
+                    "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
                     "updated_at": "2015-04-09T12:18:36Z"
                 }, {
                     "url": "https://api.github.com/repos/my-org/core/issues/945",
@@ -83,6 +84,16 @@ modules.define('github__backend', function(provide, backend) {
                     "labels": [],
                     "pull_request": {},
                     "state": "open",
+                    "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
+                    "updated_at": "2015-04-06T15:09:29Z"
+                }, {
+                    "url": "https://api.github.com/repos/my-org/core/issues/920",
+                    "number": 920,
+                    "title": "Issue no comments",
+                    "comments": 0,
+                    "labels": [],
+                    "state": "open",
+                    "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
                     "updated_at": "2015-04-06T15:09:29Z"
                 }],
             'my-org/extras': [{
@@ -105,6 +116,7 @@ modules.define('github__backend', function(provide, backend) {
                     "color": "cc317c"
                 }],
                 "state": "open",
+                "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
                 "updated_at": "2015-04-02T14:56:47Z"
             }],
             'my-org/examples': []
@@ -132,7 +144,7 @@ modules.define('github__backend', function(provide, backend) {
             'my-org/extras': [{
                 "issue_url": "https://api.github.com/repos/my-org/extras/issues/20",
                 "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
-                "updated_at": "2015-04-08T3:50:58Z",
+                "updated_at": "2014-04-08T3:50:58Z",
                 "body": "comment from 20"
             }, {
                 "issue_url": "https://api.github.com/repos/my-org/extras/issues/20",
@@ -142,7 +154,7 @@ modules.define('github__backend', function(provide, backend) {
             }, {
                 "issue_url": "https://api.github.com/repos/my-org/extras/issues/23",
                 "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
-                "updated_at": "2015-04-08T5:50:58Z",
+                "updated_at": "2014-04-08T5:50:58Z",
                 "body": "twenty-three"
             }],
             'my-org/examples': [{
@@ -163,6 +175,39 @@ modules.define('github__backend', function(provide, backend) {
             }]
         };
         return Promise.resolve(comments[repo] || []);
+    };
+    backend.getPRCommits = function(issue) {
+        var pullRequests = {
+            'my-org/core/945': [{
+                "commit": {
+                    "author": {
+                        "date": "2014-08-31T02:15:53Z"
+                    },
+                    "message": "bugfix: exception is now displayed in last failed step when there are multiple failed steps",
+                },
+                "html_url": "https://github.com/allure-framework/allure-core/commit/930be59274ca7773df62ee55d6e709b0161b78f6",
+                "author": {
+                    "login": "alkedr",
+                    "avatar_url": "https://avatars.githubusercontent.com/u/2046080?v=3",
+                    "html_url": "https://github.com/alkedr"
+                }
+            }],
+            'my-org/extras/20': [{
+                "commit": {
+                    "author": {
+                        "date": "2014-08-31T02:15:53Z"
+                    },
+                    "message": "bugfix: exception is now displayed in last failed step when there are multiple failed steps",
+                },
+                "html_url": "https://github.com/allure-framework/allure-core/commit/930be59274ca7773df62ee55d6e709b0161b78f6",
+                "author": {
+                    "login": "alkedr",
+                    "avatar_url": "https://avatars.githubusercontent.com/u/2046080?v=3",
+                    "html_url": "https://github.com/alkedr"
+                }
+            }]
+        };
+        return Promise.resolve(pullRequests[[issue.organization, issue.repository, issue.id].join('/')] || []);
     };
     provide(backend);
 });

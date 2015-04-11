@@ -15,11 +15,12 @@ modules.define(
 
             it('should request issues and group it', function() {
                 return github.getIssues(['my-org/core', 'my-org/extras', 'my-org/examples']).then(function(results) {
-                    expect(results).to.have.length(4);
-                    expect(results[0]).to.have.deep.property('comment.text', 'core latest comment');
-                    expect(results[1]).to.have.deep.property('comment.text', 'one of two comments');
-                    expect(results[2]).to.have.deep.property('comment.text', 'comment from 20');
-                    expect(results[3]).to.have.deep.property('comment.text', 'twenty-three');
+                    expect(results).to.have.length(5);
+                    expect(results[0]).to.have.deep.property('lastActivity.type', 'comment');
+                    expect(results[1]).to.have.deep.property('lastActivity.type', 'comment');
+                    expect(results[2]).to.have.deep.property('lastActivity.type', 'create');
+                    expect(results[3]).to.have.deep.property('lastActivity.type', 'commit');
+                    expect(results[4]).to.have.deep.property('lastActivity.type', 'comment');
                 });
             });
         });
