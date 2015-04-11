@@ -22,7 +22,8 @@ modules.define('github', ['github__backend'], function(provide, backend) {
                         return issues.map(function(issue) {
                             return {
                                 id: issue.number,
-                                url: issue.url,
+                                url: issue.html_url,
+                                apiUrl: issue.url,
                                 organization: repository[0],
                                 repository: repository[1],
                                 title: issue.title,
@@ -52,12 +53,12 @@ modules.define('github', ['github__backend'], function(provide, backend) {
             ]).then(function(data) {
                 var issues = data[0],
                     comments = data[1];
-                return issues.map(function(issue) {
+                return Promise.all(issues.map(function(issue) {
                     issue.comment = comments.filter(function(comment) {
-                        return comment.issueUrl === issue.url;
+                        return comment.issueUrl === issue.apiUrl;
                     })[0];
                     return issue;
-                });
+                }));
             });
         }
     });
