@@ -162,7 +162,8 @@ block('issues-grid').elem('comment-cell').match(function() {
         url: this.ctx.comment.issueUrl,
         content: {
             elem: 'date',
-            content: this.moment(this.ctx.comment.date).fromNow()
+            tag: 'span',
+            content: ' ' + this.moment(this.ctx.comment.date).fromNow()
         }
     }]
 });
@@ -178,6 +179,7 @@ block('issues-grid').elem('label')(
 );
 
 block('issues-grid').elem('user')(
+    tag()('span'),
     content()(function() {
         return [{
             block: 'image',
