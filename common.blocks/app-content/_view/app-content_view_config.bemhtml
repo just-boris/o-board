@@ -102,7 +102,7 @@ block('app-content').mod('view', 'config')(
                                 width: 'available',
                                 'has-clear': true
                             },
-                            name: 'default-token',
+                            name: 'token',
                             placeholder: '7888f1e0edfd0f7517еe8cad83e448b088dba93c',
                             autocomplete: true,
                             tabIndex: 1

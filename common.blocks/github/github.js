@@ -9,10 +9,10 @@ modules.define('github', ['github__backend'], function(provide, backend) {
         return Array.prototype.concat.apply([], array);
     }
     provide(/** @exports */{
-        getRepos: function(organization) {
+        getRepos: function(organization, options) {
             return backend.getRepos(organization);
         },
-        getIssues: function(repositories) {
+        getIssues: function(repositories, options) {
             return Promise.all([
                 Promise.all(repositories.map(function(repo) {
                     var repository = repo.split('/');
