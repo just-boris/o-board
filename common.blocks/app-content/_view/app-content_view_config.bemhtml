@@ -19,7 +19,7 @@ block('app-content').mod('view', 'config')(
                 content: [
                     {
                         elem: 'label',
-                        content: 'Ссылка на репозиторий:'
+                        content: 'Repository link:'
                     },
                     {
                         block: 'input',
@@ -28,7 +28,7 @@ block('app-content').mod('view', 'config')(
                             elem: 'control',
                             elemMods: { required: true },
                             js: {
-                                errorMessage: 'Необходимо добавить хотя бы одну ссылку на репозиторий'
+                                errorMessage: 'You need to add at least one link'
                             }
                         } : undefined,
                         mods: {
@@ -53,7 +53,7 @@ block('app-content').mod('view', 'config')(
                 {
                     block: 'title',
                     mods: { level: 4 },
-                    content: 'Настройки:'
+                    content: 'Settings:'
                 },
                 reposFields,
                 {
@@ -68,7 +68,7 @@ block('app-content').mod('view', 'config')(
                             mix: { block: 'app', elem: 'icon-field-add' },
                             icon: 'plus'
                         },
-                        text: 'Еще репозиторий'
+                        text: 'Add repository'
                     }
                 },
                 {
@@ -77,7 +77,7 @@ block('app-content').mod('view', 'config')(
                     content: [
                         {
                             elem: 'label',
-                            content: 'Сгенерируйте персональный <a href="https://help.github.com/articles/creating-an-access-token-for-command-line-use/" target="_blank">токен</a>, обязательный для работы приложения:'
+                            content: 'Generate user token <a href="https://github.com/settings/tokens/new">on this page</a> and paste here. Do not forget to check <code>admin:org</code> permission'
                         },
                         {
                             block: 'input',
@@ -86,7 +86,7 @@ block('app-content').mod('view', 'config')(
                                 elem: 'control',
                                 elemMods: { required: true },
                                 js: {
-                                    errorMessage: 'Персональный токен доступа обязателен для заполнения'
+                                    errorMessage: 'User token is required to application'
                                 }
                             },
                             mods: {
@@ -106,14 +106,14 @@ block('app-content').mod('view', 'config')(
                     block: 'button',
                     mix: { block: 'app', elem: 'btn-config-submit' },
                     mods: { theme: 'islands', size: 'l', type: 'submit', view: 'action' },
-                    text: 'Применить',
+                    text: 'Save',
                     tabIndex: 4
                 },
                 {
                     block: 'button',
                     mix: { block: 'app', elem: 'btn-config-clear' },
                     mods: { theme: 'islands', size: 'l', view: 'pseudo' },
-                    text: 'Очистить конфиг',
+                    text: 'Clear congfig',
                     tabIndex: 5
                 },
                 {
