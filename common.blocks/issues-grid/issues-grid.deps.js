@@ -1,4 +1,16 @@
-({
+([{
+    tech: 'js',
+    mustDeps: [
+        {
+            block: 'i-bem',
+            tech: 'bemhtml'
+        },
+        {
+            block: 'issues-grid',
+            tech: 'bemhtml'
+        },
+    ]
+}, {
     mustDeps: [
         { block: 'moment' }
     ],
@@ -6,6 +18,7 @@
         { block: 'icon' },
         { block: 'fa' },
         { block: 'link', mods: { theme: 'islands', size: 's' } },
-        { block: 'spin', mods: { theme: 'islands', size: 'xs' } }
+        { block: 'spin', mods: { theme: 'islands', size: 'xs' } },
+        { block: 'jquery' }
     ]
-});
+}]);
