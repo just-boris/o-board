@@ -10,13 +10,15 @@ modules.define('github', ['github__backend'], function(provide, backend) {
     }
     provide(/** @exports */{
         getRepos: function(organization, options) {
-            return backend.getRepos(organization);
+            options = options || {};
+            return backend.getRepos(organization, options);
         },
         getIssues: function(repositories, options) {
+            options = options || {};
             return Promise.all([
                 Promise.all(repositories.map(function(repo) {
                     var repository = repo.split('/');
-                    return backend.getIssues(repo).then(function(issues) {
+                    return backend.getIssues(repo, options).then(function(issues) {
                         return issues.map(function(issue) {
                             return {
                                 id: issue.number,
@@ -31,7 +33,8 @@ modules.define('github', ['github__backend'], function(provide, backend) {
                     });
                 })).then(flatten),
                 Promise.all(repositories.map(function(repo) {
-                    return backend.getComments(repo).then(function(comments) {
+                    options = options || {};
+                    return backend.getComments(repo, options).then(function(comments) {
                         return comments.map(function(comment) {
                             return {
                                 issueUrl: comment.issue_url,

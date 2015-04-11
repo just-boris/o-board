@@ -50,7 +50,8 @@ module.exports = function(config) {
             { path: 'libs/bem-core/common.blocks', check: false },
             { path: 'libs/bem-pr/spec.blocks', check: false },
             'common.blocks',
-            'desktop.blocks'
+            'desktop.blocks',
+            'configs/'+ENV+'/common.blocks'
         ]
     });
 
