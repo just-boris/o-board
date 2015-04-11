@@ -1,5 +1,5 @@
-modules.define('github', function(provide, github) {
+modules.define('github__backend', function(provide, backend) {
     "use strict";
-    github.CLIENT_ID = '';
-    provide(github);
+    backend.CLIENT_ID = '';
+    provide(backend);
 });
