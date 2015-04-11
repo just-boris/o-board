@@ -16,7 +16,7 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
             state: {
                 config: function () {
                     this._showContent({ block: 'app-content', mods: { view: 'config' } });
-                    //this._getBtnConfigSubmit().on('click', this._onClickBtnConfigSubmit, this);
+                    this._getFormConfig().on('submit', this._onFormConfigSubmit, this);
                 },
 
                 loading: function () {
@@ -41,6 +41,11 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
                 },
 
                 content: function () {
+                    //this._showContent({
+                    //    tag: 'pre',
+                    //    content: JSON.stringify(this._issues, null, 4)
+                    //});
+
                     this._showContent({
                         block: 'app-content',
                         mods: { view: 'content' },
@@ -50,18 +55,38 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
             }
         },
 
-        _onClickBtnConfigSubmit: function () {
+        _onFormConfigSubmit: function (e, data) {
             /**
              * сериализуем форму и сохраняем конфиг,
              * переставляем модификатор в loading
              */
-            this._config = {
-                token: 'default-token',
-                repositories: [
-                    'allure-framework/allure-core',
-                    'allure-framework/allure-teamcity-plugin'
-                ]
-            };
+
+            if (!data) return;
+            if (!this._config) this._config = {};
+
+            var _config = this._config;
+
+            data.forEach(function (item) {
+
+                if (item.value === '') return false;
+                if (item.name === 'repositories') {
+
+                    if(!_config.repositories) {
+                        _config.repositories = []
+                    }
+
+                    // if exist, remove slash before url
+                    if ((/^\//gi).test(item.value)) {
+                        item.value = item.value.slice(1);
+                    }
+
+                    _config.repositories.push(item.value);
+
+                } else {
+                    _config[item.name] = item.value;
+                }
+            });
+
             window.localStorage.setItem('config', JSON.stringify(this._config));
 
             this.setMod('state', 'loading');
@@ -79,8 +104,8 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
             return this._spin || (this._spin = this.findBlockInside('spin', 'spin'));
         },
 
-        _getBtnConfigSubmit: function () {
-            return this._btnConfigSubmit || (this._btnConfigSubmit = this.findBlockInside('btn-config-submit', 'button'));
+        _getFormConfig: function () {
+            return this._formConfig || (this._formConfig = this.findBlockInside('form'));
         }
     }));
 });

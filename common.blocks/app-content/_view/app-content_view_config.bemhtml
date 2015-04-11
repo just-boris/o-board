@@ -19,14 +19,22 @@ block('app-content').mod('view', 'config')(
                         },
                         {
                             block: 'input',
+                            mix: {
+                                block: 'form',
+                                elem: 'control',
+                                elemMods: { required: true },
+                                js: {
+                                    errorMessage: 'Необходимо добавить хотя бы одну ссылку на репозиторий'
+                                }
+                            },
                             mods: {
                                 theme: 'islands',
                                 size: 'l',
                                 width: 'available',
                                 'has-clear': true
                             },
-                            name: 'repo',
-                            placeholder: '/just-boris/o-board/',
+                            name: 'repositories',
+                            placeholder: 'https://github.com/just-boris/o-board/',
                             autocomplete: true,
                             tabIndex: 1
                         }
@@ -38,7 +46,7 @@ block('app-content').mod('view', 'config')(
                     content: [
                         {
                             elem: 'label',
-                            content: 'Сгенерируйте персональный <a href="https://help.github.com/articles/creating-an-access-token-for-command-line-use/" target="_blank">токен</a>, обязательный для работы приложения:'
+                            content: 'Ссылка на репозиторий:'
                         },
                         {
                             block: 'input',
@@ -48,7 +56,53 @@ block('app-content').mod('view', 'config')(
                                 width: 'available',
                                 'has-clear': true
                             },
-                            name: 'repo',
+                            name: 'repositories',
+                            placeholder: 'https://github.com/bem/bem-components/',
+                            autocomplete: true,
+                            tabIndex: 1
+                        }
+                    ]
+                },
+                {
+                    elem: 'field',
+                    mix: { block: 'app', elem: 'form-field' },
+                    content: {
+                        block: 'button',
+                        mix: { block: 'form', elem: 'field-add' },
+                        mods: { theme: 'islands', size: 's' },
+                        icon: {
+                            block: 'fa',
+                            mix: { block: 'app', elem: 'icon-field-add' },
+                            icon: 'plus'
+                        },
+                        text: 'Еще репозиторий'
+                    }
+                },
+                {
+                    elem: 'field',
+                    mix: { block: 'app', elem: 'form-field' },
+                    content: [
+                        {
+                            elem: 'label',
+                            content: 'Сгенерируйте персональный <a href="https://help.github.com/articles/creating-an-access-token-for-command-line-use/" target="_blank">токен</a>, обязательный для работы приложения:'
+                        },
+                        {
+                            block: 'input',
+                            mix: {
+                                block: 'form',
+                                elem: 'control',
+                                elemMods: { required: true },
+                                js: {
+                                    errorMessage: 'Персональный токен доступа обязателен для заполнения'
+                                }
+                            },
+                            mods: {
+                                theme: 'islands',
+                                size: 'l',
+                                width: 'available',
+                                'has-clear': true
+                            },
+                            name: 'default-token',
                             placeholder: '7888f1e0edfd0f7517еe8cad83e448b088dba93c',
                             autocomplete: true,
                             tabIndex: 1
@@ -60,6 +114,11 @@ block('app-content').mod('view', 'config')(
                     mix: { block: 'app', elem: 'btn-config-submit' },
                     mods: { theme: 'islands', size: 'l', type: 'submit', view: 'action' },
                     text: 'Применить'
+                },
+                {
+                    block : 'popup',
+                    mix: { block: 'form', elem: 'popup-error' },
+                    mods : { theme : 'islands', target : 'anchor', autoclosable : true }
                 }
             ]
         };
