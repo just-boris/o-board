@@ -82,10 +82,10 @@ modules.define('github', ['github__backend'], function(provide, backend) {
         },
         getIssues: function(repositories, options) {
             options = options || {};
-            return Promise.all([
-                Promise.all(repositories.map(function(repo) {
-                    var repository = repo.split('/');
-                    return backend.getIssues(repo, options).then(function(issues) {
+            return Promise.all(repositories.map(function(repo) {
+                var repository = repo.split('/');
+                return Promise.all([
+                    backend.getIssues(repo, options).then(function(issues) {
                         return issues.map(function(issue) {
                             return {
                                 id: issue.number,
@@ -104,11 +104,8 @@ modules.define('github', ['github__backend'], function(provide, backend) {
                                 isPullRequest: !!issue.pull_request
                             };
                         });
-                    });
-                })).then(flatten),
-                Promise.all(repositories.map(function(repo) {
-                    options = options || {};
-                    return backend.getComments(repo, options).then(function(comments) {
+                    }),
+                    backend.getComments(repo, options).then(function(comments) {
                         return comments.map(function(comment) {
                             return {
                                 type: 'comment',
@@ -122,17 +119,31 @@ modules.define('github', ['github__backend'], function(provide, backend) {
                                 text: comment.body
                             };
                         });
-                    });
-                })).then(flatten)
-            ]).then(function(data) {
-                var issues = data[0],
-                    comments = data[1];
-                return Promise.all(issues.map(function(issue) {
-                    issue.comment = comments.filter(function(comment) {
-                        return comment.issueUrl === issue.apiUrl;
-                    })[0];
-                    return lastActivity(issue, options);
-                }));
+                    }),
+                    backend.getCollaborators(repo, options).then(function(collaborators) {
+                        return collaborators.map(function(collaborator) {
+                            return collaborator.login;
+                        });
+                    })
+                ]).then(function(data) {
+                    var issues = data[0],
+                        comments = data[1],
+                        collaborators = data[2];
+                    return Promise.all(issues.map(function(issue) {
+                        issue.comment = comments.filter(function(comment) {
+                            return comment.issueUrl === issue.apiUrl;
+                        })[0];
+                        return Promise.resolve(lastActivity(issue, options)).then(function(issue) {
+                            issue.answered = collaborators.indexOf(issue.lastActivity.author.login) > -1;
+                            return issue;
+                        });
+                    }));
+                });
+            })).then(flatten).then(function(results) {
+                return results.reduce(function(all, issue) {
+                    all[issue.answered ? 'answered': 'unanswered'].push(issue);
+                    return all;
+                }, {answered: [], unanswered: []});
             });
         }
     });

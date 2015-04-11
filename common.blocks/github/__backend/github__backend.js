@@ -16,6 +16,10 @@ modules.define('github__backend', function(provide) {
             return fetch(GITHUB_ENDPOINT+'/users/'+organization+'/repos', this._getHeaders(options.token))
                 .then(this._fromJSON);
         },
+        getCollaborators: function(repo, options) {
+            return fetch(GITHUB_ENDPOINT+'/repos/'+repo+'/collaborators', this._getHeaders(options.token))
+                .then(this._fromJSON);
+        },
         getPRCommits: function(issue, options) {
             return fetch(GITHUB_ENDPOINT+'/repos/'+issue.organization+'/'+issue.repository+'/pulls/'+issue.id+'/commits',
                 this._getHeaders(options.token)).then(this._fromJSON);

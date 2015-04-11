@@ -15,12 +15,13 @@ modules.define(
 
             it('should request issues and group it', function() {
                 return github.getIssues(['my-org/core', 'my-org/extras', 'my-org/examples']).then(function(results) {
-                    expect(results).to.have.length(5);
-                    expect(results[0]).to.have.deep.property('lastActivity.type', 'comment');
-                    expect(results[1]).to.have.deep.property('lastActivity.type', 'comment');
-                    expect(results[2]).to.have.deep.property('lastActivity.type', 'create');
-                    expect(results[3]).to.have.deep.property('lastActivity.type', 'commit');
-                    expect(results[4]).to.have.deep.property('lastActivity.type', 'comment');
+                    expect(results.answered).to.have.length(2);
+                    expect(results.unanswered).to.have.length(3);
+                    expect(results.unanswered[0]).to.have.deep.property('lastActivity.type', 'comment');
+                    expect(results.unanswered[1]).to.have.deep.property('lastActivity.type', 'create');
+                    expect(results.unanswered[2]).to.have.deep.property('lastActivity.type', 'commit');
+                    expect(results.answered[0]).to.have.deep.property('lastActivity.type', 'comment');
+                    expect(results.answered[1]).to.have.deep.property('lastActivity.type', 'comment');
                 });
             });
         });

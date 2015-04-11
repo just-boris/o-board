@@ -132,7 +132,7 @@ modules.define('github__backend', function(provide, backend) {
                 "body": "core latest comment"
             }, {
                 "issue_url": "https://api.github.com/repos/my-org/core/issues/945",
-                "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
+                "user": {"login": "baev", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
                 "updated_at": "2015-04-08T1:50:58Z",
                 "body": "one of two comments"
             }, {
@@ -143,7 +143,7 @@ modules.define('github__backend', function(provide, backend) {
             }],
             'my-org/extras': [{
                 "issue_url": "https://api.github.com/repos/my-org/extras/issues/20",
-                "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
+                "user": {"login": "baev", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
                 "updated_at": "2014-04-08T3:50:58Z",
                 "body": "comment from 20"
             }, {
@@ -153,7 +153,7 @@ modules.define('github__backend', function(provide, backend) {
                 "body": "my comment"
             }, {
                 "issue_url": "https://api.github.com/repos/my-org/extras/issues/23",
-                "user": {"login": "aristov", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
+                "user": {"login": "baev", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
                 "updated_at": "2014-04-08T5:50:58Z",
                 "body": "twenty-three"
             }],
@@ -208,6 +208,23 @@ modules.define('github__backend', function(provide, backend) {
             }]
         };
         return Promise.resolve(pullRequests[[issue.organization, issue.repository, issue.id].join('/')] || []);
+    };
+    backend.getCollaborators = function() {
+        return Promise.resolve(
+            [{
+                "login": "just-boris",
+                "avatar_url": "https://avatars.githubusercontent.com/u/812240?v=3",
+                "html_url": "https://github.com/just-boris"
+            }, {
+                "login": "baev",
+                "avatar_url": "https://avatars.githubusercontent.com/u/2149631?v=3",
+                "html_url": "https://github.com/baev"
+            }, {
+                "login": "qatools-ci",
+                "avatar_url": "https://avatars.githubusercontent.com/u/4466920?v=3",
+                "html_url": "https://github.com/qatools-ci"
+            }]
+        );
     };
     provide(backend);
 });
