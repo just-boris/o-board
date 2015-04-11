@@ -1,6 +1,7 @@
 //noinspection BadExpressionStatementJS
 ({
     mustDeps : [
-        'fetch'
+        'fetch',
+        {elem: 'backend'}
     ]
 });

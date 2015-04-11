@@ -77,7 +77,7 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
                 if (item.name === 'repositories') {
 
                     if(!_config.repositories) {
-                        _config.repositories = []
+                        _config.repositories = [];
                     }
 
                     // if exist, remove slash before url

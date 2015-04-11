@@ -1,4 +1,6 @@
-var techs = {
+var ENV = process.env.YENV || 'development',
+    isProd = process.env.YENV === 'production',
+    techs = {
         // essential
         fileProvider: require('enb/techs/file-provider'),
         fileMerge: require('enb/techs/file-merge'),
@@ -23,18 +25,18 @@ var techs = {
     },
     enbBemTechs = require('enb-bem-techs'),
     levels = [
-        { path: 'libs/bem-core/common.blocks', check: false },
-        { path: 'libs/bem-core/desktop.blocks', check: false },
-        { path: 'libs/bem-components/common.blocks', check: false },
-        { path: 'libs/bem-components/desktop.blocks', check: false },
-        { path: 'libs/bem-components/design/common.blocks', check: false },
-        { path: 'libs/bem-components/design/desktop.blocks', check: false },
+        {path: 'libs/bem-core/common.blocks', check: false},
+        {path: 'libs/bem-core/desktop.blocks', check: false},
+        {path: 'libs/bem-components/common.blocks', check: false},
+        {path: 'libs/bem-components/desktop.blocks', check: false},
+        {path: 'libs/bem-components/design/common.blocks', check: false},
+        {path: 'libs/bem-components/design/desktop.blocks', check: false},
         'common.blocks',
-        'desktop.blocks'
+        'desktop.blocks',
+        'configs/'+ENV+'/common.blocks'
     ];
 
 module.exports = function(config) {
-    var isProd = process.env.YENV === 'production';
 
     config.includeConfig('enb-bem-specs'); // Подключаем модуль `enb-bem-specs`.
 
