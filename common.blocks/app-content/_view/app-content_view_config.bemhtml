@@ -34,7 +34,7 @@ block('app-content').mod('view', 'config')(
                                 'has-clear': true
                             },
                             name: 'repositories',
-                            placeholder: 'https://github.com/just-boris/o-board/',
+                            placeholder: 'organization/repo',
                             autocomplete: true,
                             tabIndex: 1
                         }
@@ -57,7 +57,7 @@ block('app-content').mod('view', 'config')(
                                 'has-clear': true
                             },
                             name: 'repositories',
-                            placeholder: 'https://github.com/bem/bem-components/',
+                            placeholder: 'organization/one-more-repo',
                             autocomplete: true,
                             tabIndex: 1
                         }
