@@ -8,7 +8,6 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
                         this._config = JSON.parse(window.localStorage.getItem('config'));
                     } catch(e) {}
 
-
                     this.setMod('state', this._config ? 'loading' : 'config');
 
                     //this.channel('app').on('refresh', function(event) {

@@ -1,6 +1,6 @@
 modules.define('form',
-    ['i-bem__dom', 'jquery'],
-    function (provide, BEMDOM, $) {
+    ['i-bem__dom', 'jquery', 'BEMHTML'],
+    function (provide, BEMDOM, $, BEMHTML) {
         provide(BEMDOM.decl(this.name, {
             onSetMod: {
                 js: {
@@ -9,6 +9,10 @@ modules.define('form',
                         BEMDOM.blocks['input'].on(
                             { modName : 'focused', modVal : true }, this._onFocus, this
                         );
+
+                        if (this._getBtnAddField()) {
+                            this._getBtnAddField().on('click', this._onBtnAddFieldClick, this);
+                        }
                     }
                 }
             },
@@ -30,6 +34,35 @@ modules.define('form',
 
             _onFocus: function () {
                 this._getPopup().delMod('visible');
+            },
+
+            _onBtnAddFieldClick: function () {
+                var bemjson = {
+                    elem: 'field',
+                    mix: { block: 'app', elem: 'form-field' },
+                    elemMods: { id: 'repositories' },
+                    content: [
+                        {
+                            elem: 'label',
+                            content: 'Ссылка на репозиторий:'
+                        },
+                        {
+                            block: 'input',
+                            mods: {
+                                theme: 'islands',
+                                size: 'l',
+                                width: 'available',
+                                'has-clear': true
+                            },
+                            name: 'repositories',
+                            placeholder: 'organization/one-more-repo',
+                            autocomplete: true,
+                            tabIndex: 1
+                        }
+                    ]
+                };
+
+                BEMDOM.after(this.elem('field', 'id', 'repositories').last(), BEMHTML.apply(bemjson));
             },
 
             /**
@@ -72,6 +105,10 @@ modules.define('form',
 
             _getPopup: function () {
                 return this._popup || (this._popup = this.findBlockInside('popup'));
+            },
+
+            _getBtnAddField: function () {
+                return this._btnAddField || (this._btnAddField = this.findBlockInside('field-add', 'button'));
             }
         }));
     });

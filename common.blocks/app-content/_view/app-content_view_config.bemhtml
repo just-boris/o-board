@@ -12,6 +12,7 @@ block('app-content').mod('view', 'config')(
                 {
                     elem: 'field',
                     mix: { block: 'app', elem: 'form-field' },
+                    elemMods: { id: 'repositories' },
                     content: [
                         {
                             elem: 'label',
@@ -43,6 +44,7 @@ block('app-content').mod('view', 'config')(
                 {
                     elem: 'field',
                     mix: { block: 'app', elem: 'form-field' },
+                    elemMods: { id: 'repositories' },
                     content: [
                         {
                             elem: 'label',
@@ -68,7 +70,7 @@ block('app-content').mod('view', 'config')(
                     mix: { block: 'app', elem: 'form-field' },
                     content: {
                         block: 'button',
-                        mix: { block: 'form', elem: 'field-add' },
+                        mix: { block: 'form', elem: 'field-add', js: { id: 'repositories' } },
                         mods: { theme: 'islands', size: 's' },
                         icon: {
                             block: 'fa',
