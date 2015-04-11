@@ -42,6 +42,8 @@ block('issues-grid').content()(function() {
                 issue: issue
             };
         })
+    }, {
+        block: 'perdula'
     }];
 });
 
@@ -61,32 +63,36 @@ block('issues-grid').elem('cell').elemMod('header', true).elemMod('sorter', true
     }]
 });
 
-block('issues-grid').elem('issue-row').content()(function() {
-    return [{
-        elem: 'pr-cell',
-        mix: { elem: 'cell' },
-        isPullRequest: this.ctx.issue.isPullRequest
-    }, {
-        elem: 'issue-cell',
-        mix: { elem: 'cell' },
-        url: this.ctx.issue.url,
-        organization: this.ctx.issue.organization,
-        repository: this.ctx.issue.repository,
-        id: this.ctx.issue.id
-    }, {
-        elem: 'title-cell',
-        mix: { elem: 'cell' },
-        title: this.ctx.issue.title
-    }, {
-        elem: 'labels-cell',
-        mix: { elem: 'cell' },
-        labels: this.ctx.issue.labels
-    }, {
-        elem: 'comment-cell',
-        mix: { elem: 'cell' },
-        comment: this.ctx.issue.comment
-    }];
-});
+block('issues-grid').elem('issue-row')(
+    attrs()(function() {
+        return { 'data-issue': this.ctx.issue.id }
+    }),
+    content()(function() {
+        return [{
+            elem: 'pr-cell',
+            mix: { elem: 'cell' },
+            isPullRequest: this.ctx.issue.isPullRequest
+        }, {
+            elem: 'issue-cell',
+            mix: { elem: 'cell' },
+            url: this.ctx.issue.url,
+            organization: this.ctx.issue.organization,
+            repository: this.ctx.issue.repository,
+            id: this.ctx.issue.id
+        }, {
+            elem: 'title-cell',
+            mix: { elem: 'cell' },
+            title: this.ctx.issue.title
+        }, {
+            elem: 'labels-cell',
+            mix: { elem: 'cell' },
+            labels: this.ctx.issue.labels
+        }, {
+            elem: 'comment-cell',
+            mix: { elem: 'cell' },
+            comment: this.ctx.issue.comment
+        }];
+    }));
 
 block('issues-grid').elem('pr-cell')(
     match(function() {

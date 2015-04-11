@@ -1,0 +1,30 @@
+block('perdula').js()(true)
+
+block('perdula').content()(function() {
+    return [{
+        elem: 'panel',
+        content: [{
+            elem: 'content',
+            content: this.ctx.content
+        }]
+    }, {
+        elem: 'paranja'
+    }]
+});
+
+block('perdula')(def()
+        .match(!this.ctx._wrapped)(function() {
+        var ctx = this.ctx;
+
+        ctx._wrapped=true;
+
+        ctx.mods = this.extend({
+                position: 'right',
+                visible: 'no'
+            },
+            ctx.mods
+        );
+
+        applyCtx(ctx)
+    })
+);

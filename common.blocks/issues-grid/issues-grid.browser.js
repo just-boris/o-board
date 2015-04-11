@@ -1,13 +1,14 @@
 /* global modules:false */
 modules.define('issues-grid',
-    ['i-bem__dom', 'BEMHTML', 'jquery'],
-    function(provide, BEMDOM, BEMHTML, JQuery) {
+    ['i-bem__dom', 'BEMHTML', 'jquery', 'github'],
+    function(provide, BEMDOM, BEMHTML, JQuery, github) {
         'use strict';
         provide(BEMDOM.decl(this.name, {
             onSetMod: {
                 js: {
                     inited: function() {
                         this._issues = this.params.issues;
+                        this._perdula = this.findBlockInside('perdula');
                     }
                 }
             },
@@ -101,12 +102,85 @@ modules.define('issues-grid',
 
             _titleSorter: function(left, right) {
                 return left.title > right.title;
+            },
+
+            _onRowClick: function(event) {
+                var elem = event.currentTarget,
+                    issueId = elem.data().issue;
+
+                this.setMod(elem, 'selected');
+
+                var issue = this._getIssue(issueId);
+                this._perdula.setContent(this._getIssueContent(issue));
+                this._perdula.show();
+                this._perdula.once('hide', function() {
+                    this.delMod(elem, 'selected');
+                }, this)
+            },
+
+            _getIssueContent: function() {
+                return 'Hello world';
+            },
+
+            _getIssue: function(issueId) {
+                return {
+                    comments: [{
+                        issueUrl: '//github.com',
+                        author: {
+                            avatarUrl: 'https://avatars.githubusercontent.com/u/475746?v=3',
+                            login: 'tadatuta',
+                            url: 'https://github.com/tadatuta'
+                        },
+                        date: '2015-04-08T20:46:32Z',
+                        text: 'Thanks for the corrections - updated the doc accordingly'
+                    }, {
+                        issueUrl: '//github.com',
+                        author: {
+                            avatarUrl: 'https://avatars.githubusercontent.com/u/475746?v=3',
+                            login: 'tadatuta',
+                            url: 'https://github.com/tadatuta'
+                        },
+                        date: '2015-04-08T20:46:32Z',
+                        text: 'Thanks for the corrections - updated the doc accordingly'
+                    }, {
+                        issueUrl: '//github.com',
+                        author: {
+                            avatarUrl: 'https://avatars.githubusercontent.com/u/475746?v=3',
+                            login: 'tadatuta',
+                            url: 'https://github.com/tadatuta'
+                        },
+                        date: '2015-04-08T20:46:32Z',
+                        text: 'Thanks for the corrections - updated the doc accordingly'
+                    }, {
+                        issueUrl: '//github.com',
+                        author: {
+                            avatarUrl: 'https://avatars.githubusercontent.com/u/475746?v=3',
+                            login: 'tadatuta',
+                            url: 'https://github.com/tadatuta'
+                        },
+                        date: '2015-04-08T20:46:32Z',
+                        text: 'Thanks for the corrections - updated the doc accordingly'
+                    }, {
+                        issueUrl: '//github.com',
+                        author: {
+                            avatarUrl: 'https://avatars.githubusercontent.com/u/475746?v=3',
+                            login: 'tadatuta',
+                            url: 'https://github.com/tadatuta'
+                        },
+                        date: '2015-04-08T20:46:32Z',
+                        text: 'Thanks for the corrections - updated the doc accordingly'
+                    }]
+                }
             }
         }, {
 
             live: function() {
                 this.liveBindTo('sorter', 'click', function(event) {
                     this._onSorterClick(event)
+                });
+
+                this.liveBindTo('issue-row', 'click', function(event) {
+                    this._onRowClick(event);
                 })
             }
 

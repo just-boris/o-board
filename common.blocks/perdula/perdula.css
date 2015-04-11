@@ -1,0 +1,85 @@
+.perdula
+{
+    position: relative;
+}
+
+.perdula_position_right .perdula__panel
+{
+    right: 0;
+    top: 0;
+    bottom: 0;
+
+    -webkit-transform: translateX(100%);
+    -moz-transform: translateX(100%);
+    -o-transform: translateX(100%);
+    transform: translateX(100%);
+}
+
+
+.perdula__panel
+{
+    visibility: hidden;
+
+    width: 650px;
+
+    position: fixed;
+    overflow: auto;
+
+    z-index: 101;
+
+    background: white;
+
+    box-shadow: inset 0 0 0 1px rgba(0,0,0, .15), 0 8px 30px -5px rgba(0,0,0, .5);
+
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+.perdula__paranja
+{
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    z-index: 100;
+
+    background: rgba(255,255,255,.85);
+}
+
+.perdula_visible_yes .perdula__panel
+{
+    visibility: visible;
+
+    transition-delay:0s;
+
+    -webkit-transform: translateX(0);
+    -moz-transform: translateX(0);
+    -o-transform: translateX(0);
+    transform: translateX(0);
+}
+
+.perdula_visible_yes .perdula__paranja
+{
+    visibility: visible;
+    opacity: 1;
+
+    -webkit-transition: opacity .3s ease-out;
+    -moz-transition: opacity .3s ease-out;
+    -o-transition: opacity .3s ease-out;
+    transition: opacity .3s ease-out;
+}
+
+.perdula_visible_no .perdula__paranja
+{
+    visibility: hidden;
+    opacity: 0;
+
+    -webkit-transition: visibility 0s linear .3s,opacity .3s ease-out;
+    -moz-transition: visibility 0s linear .3s,opacity .3s ease-out;
+    -o-transition: visibility 0s linear .3s,opacity .3s ease-out;
+    transition: visibility 0s linear .3s,opacity .3s ease-out;
+}
