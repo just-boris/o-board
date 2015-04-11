@@ -56,11 +56,59 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
         },
 
         _onFilterChange: function (e, data) {
-            console.log('data', data);
-
             if (this._issues) {
-                console.log('this._issues', this._issues);
-                var result = [];
+                var result = this._issues
+                    .filter(function (item) {
+
+                        // filter by repositories
+                        if (data.repository && data.repository !== 'All repositories') {
+                            var url = item.organization + '/' + item.repository;
+
+                            return data.repository === url;
+                        }  else {
+                            return true;
+                        }
+                    })
+                    .filter(function (item) {
+
+                        if (data.issues === false && data.pullRequests === true) {
+                            // show only PR
+                            return item.isPullRequest === true;
+                        } else if (data.issues === true && data.pullRequests === false) {
+                            // show only issues
+                            return item.isPullRequest === false;
+                        } else {
+                            return true;
+                        }
+
+                    })
+                    .filter(function (item) {
+
+                        // date: 11.11.2014
+                        if (data.date) {
+                            return item.comment.filter(function (comment) {
+                                var date = new Date('11.11.2014'),
+                                    dateComment = new Date(comment.date);
+
+                                return date.toDateString() === dateComment.toDateString()
+                            });
+                        } else {
+                            return true;
+                        }
+                    });
+
+                console.log('result', result);
+
+                var bemjson = {
+                    block: 'app-content',
+                    mods: { view: 'content' },
+                    elem: 'layout',
+                    issues: result
+                };
+
+                console.log('html', BEMHTML.apply(bemjson));
+
+                BEMDOM.replace(this.findBlockInside('app-content').findElem('layout'), BEMHTML.apply(bemjson));
             }
         },
 

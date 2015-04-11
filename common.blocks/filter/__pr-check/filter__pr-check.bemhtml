@@ -8,8 +8,8 @@ block('filter').elem('pr-check')(
             block : 'checkbox',
             mods : { theme : 'islands', size : 'm', checked : true },
             name: 'pr_check',
-            val : 'true',
+            val : true,
             text : 'Pull requests'
         };
     })
-)
+);

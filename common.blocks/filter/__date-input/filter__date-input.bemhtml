@@ -11,4 +11,4 @@ block('filter').elem('date-input')(
             placeholder : 'дата создания'
         }
     })
-)
+);

@@ -9,7 +9,7 @@ block('filter').elem('issue-check')(
             block : 'checkbox',
             mods : { theme : 'islands', size : 'm', checked : true },
             name: 'issues_check',
-            val : 'true',
+            val : true,
             text : 'Issues'
         };
     })

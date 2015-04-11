@@ -5,6 +5,8 @@ block('app-content').mod('view', 'config')(
         if (!config) config = {};
         if (!config.repositories) config.repositories = ['', ''];
 
+
+
         var reposFields = config.repositories.map(function (item, idx) {
 
             var id = idx + 1;

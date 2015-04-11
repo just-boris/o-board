@@ -20,6 +20,7 @@
         { block: 'link', mods: { theme: 'islands', size: 's' } },
         { block: 'spin', mods: { theme: 'islands', size: 'xs' } },
         { block: 'jquery' },
-        { block: 'image' }
+        { block: 'image' },
+        { block: 'perdula' }
     ]
 }]);
