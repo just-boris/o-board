@@ -1,42 +1,62 @@
-block('issues-grid')(
-    content()(function() {
-        return [{
-            elem: 'header',
-            content: {
-                elem: 'row',
-                content: [{
-                    elem: 'cell',
-                    elemMods: { header: true },
-                    content: 'PR'
-                }, {
-                    elem: 'cell',
-                    elemMods: { header: true },
-                    content: 'Issue'
-                }, {
-                    elem: 'cell',
-                    elemMods: { header: true },
-                    content: 'Title'
-                }, {
-                    elem: 'cell',
-                    elemMods: { header: true },
-                    content: 'Labels'
-                }, {
-                    elem: 'cell',
-                    elemMods: { header: true },
-                    content: 'Last comment'
-                }]
-            }
-        }, {
-            elem: 'body',
-            content: this.ctx.issues.map(function(issue) {
-                return {
-                    elem: 'issue-row',
-                    issue: issue
-                };
-            })
-        }];
-    })
-);
+block('issues-grid').js()({
+    issues: this.ctx.issues
+});
+
+block('issues-grid').content()(function() {
+    return [{
+        elem: 'header',
+        content: {
+            elem: 'row',
+            content: [{
+                elem: 'cell',
+                elemMods: { header: true },
+                content: 'PR'
+            }, {
+                elem: 'cell',
+                attrs: { 'data-key': 'issue' },
+                elemMods: { header: true, sorter: true },
+                content: 'Issue'
+            }, {
+                elem: 'cell',
+                attrs: { 'data-key': 'title' },
+                elemMods: { header: true, sorter: true },
+                content: 'Title'
+            }, {
+                elem: 'cell',
+                elemMods: { header: true },
+                content: 'Labels'
+            }, {
+                elem: 'cell',
+                attrs: { 'data-key': 'comment' },
+                elemMods: { header: true, sorter: true },
+                content: 'Last comment'
+            }]
+        }
+    }, {
+        elem: 'body',
+        content: this.ctx.issues.map(function(issue) {
+            return {
+                elem: 'issue-row',
+                issue: issue
+            };
+        })
+    }];
+});
+
+block('issues-grid').elem('cell').elemMod('header', true).elemMod('sorter', true).content()(function() {
+    return [{
+        elem: 'title',
+        tag: 'span',
+        content: this.ctx.content
+    }, {
+        elem: 'sorter',
+        tag: 'span',
+        content: {
+            block: 'fa',
+            icon: 'angle-down'
+        }
+    }]
+});
 
 block('issues-grid').elem('issue-row').content()(function() {
     console.log('this.ctx.issue', this.ctx.issue);

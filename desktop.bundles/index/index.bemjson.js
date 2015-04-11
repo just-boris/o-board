@@ -32,6 +32,7 @@ module.exports = {
             },
             {
                 block: 'issues-grid',
+                sort: { key: 'title', direction: 'dsc' },
                 issues: [{
                     isPullRequest: true,
                     url: '//github.com',
@@ -42,10 +43,10 @@ module.exports = {
                     labels: [{
                         name: 'label',
                         color: '#ff0000'
-                    },{
+                    }, {
                         name: 'label2',
                         color: '#00ff00'
-                    },{
+                    }, {
                         name: 'label3',
                         color: '#0000ff'
                     }],
@@ -57,7 +58,7 @@ module.exports = {
                         text: 'commentText',
                         date: Date.now()
                     }
-                },{
+                }, {
                     isPullRequest: true,
                     url: '//github.com',
                     organization: 'MyOrganization',
@@ -76,7 +77,7 @@ module.exports = {
                         text: 'commentText',
                         date: Date.now()
                     }
-                },{
+                }, {
                     isPullRequest: true,
                     url: '//github.com',
                     organization: 'MyOrganization',
@@ -95,7 +96,7 @@ module.exports = {
                         text: 'commentText',
                         date: Date.now()
                     }
-                },{
+                }, {
                     isPullRequest: true,
                     url: '//github.com',
                     organization: 'MyOrganization',
@@ -114,7 +115,7 @@ module.exports = {
                         text: 'commentText',
                         date: Date.now()
                     }
-                },{
+                }, {
                     isPullRequest: true,
                     url: '//github.com',
                     organization: 'MyOrganization',
@@ -133,7 +134,7 @@ module.exports = {
                         text: 'commentText',
                         date: Date.now()
                     }
-                },{
+                }, {
                     isPullRequest: true,
                     url: '//github.com',
                     organization: 'MyOrganization',
@@ -152,7 +153,7 @@ module.exports = {
                         text: 'commentText',
                         date: Date.now()
                     }
-                },{
+                }, {
                     isPullRequest: true,
                     url: '//github.com',
                     organization: 'MyOrganization',
@@ -171,7 +172,7 @@ module.exports = {
                         text: 'commentText',
                         date: Date.now()
                     }
-                },{
+                }, {
                     isPullRequest: true,
                     url: '//github.com',
                     organization: 'MyOrganization',

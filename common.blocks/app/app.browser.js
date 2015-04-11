@@ -10,6 +10,11 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
 
 
                     this.setMod('state', this._config ? 'loading' : 'config');
+
+                    this.channel('app').on('refresh', function(event) {
+                        // берем фильтры
+                        // обновляем весь контент, нахер сортировку, пока что.
+                    });
                 }
             },
 
