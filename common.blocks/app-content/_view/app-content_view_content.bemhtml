@@ -1,8 +1,21 @@
 block('app-content').mod('view', 'content')(
     content()(function () {
-        return {
+        return [{
+            elem: 'title',
+            elemMods: { type: 'unswer' },
+            tag: 'h2',
+            content: [{ block: 'fa', icon: 'dot-circle-o' }, ' Unanswered']
+        },{
             block: 'issues-grid',
             issues: this.ctx.issues
-       };
+        },{
+            elem: 'title',
+            tag: 'h2',
+            elemMods: { type: 'feedback' },
+            content: [{ block: 'fa', icon: 'dot-circle-o' }, ' Waiting for feedback']
+        },{
+            block: 'issues-grid',
+            issues: this.ctx.issues
+       }];
     })
 );
