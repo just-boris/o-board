@@ -1,5 +1,49 @@
 block('app-content').mod('view', 'config')(
     content()(function () {
+        var config = this.ctx.config;
+
+        if (!config) config = {};
+        if (!config.repositories) config.repositories = ['', ''];
+
+        var reposFields = config.repositories.map(function (item, idx) {
+
+            var id = idx + 1;
+
+            return {
+                block: 'form',
+                elem: 'field',
+                mix: { block: 'app', elem: 'form-field' },
+                elemMods: { id: 'repositories' },
+                content: [
+                    {
+                        elem: 'label',
+                        content: 'Ссылка на репозиторий:'
+                    },
+                    {
+                        block: 'input',
+                        mix: id === 1 ? {
+                            block: 'form',
+                            elem: 'control',
+                            elemMods: { required: true },
+                            js: {
+                                errorMessage: 'Необходимо добавить хотя бы одну ссылку на репозиторий'
+                            }
+                        } : undefined,
+                        mods: {
+                            theme: 'islands',
+                            size: 'l',
+                            width: 'available',
+                            'has-clear': true
+                        },
+                        name: 'repositories',
+                        val: item,
+                        placeholder: id % 2 === 0 ? 'organization/one-more-repo' : 'organization/repo',
+                        tabIndex: id
+                    }
+                ]
+            }
+        });
+
         return {
             block: 'form',
             mix: { block: 'app', elem: 'form' },
@@ -9,62 +53,7 @@ block('app-content').mod('view', 'config')(
                     mods: { level: 4 },
                     content: 'Настройки:'
                 },
-                {
-                    elem: 'field',
-                    mix: { block: 'app', elem: 'form-field' },
-                    elemMods: { id: 'repositories' },
-                    content: [
-                        {
-                            elem: 'label',
-                            content: 'Ссылка на репозиторий:'
-                        },
-                        {
-                            block: 'input',
-                            mix: {
-                                block: 'form',
-                                elem: 'control',
-                                elemMods: { required: true },
-                                js: {
-                                    errorMessage: 'Необходимо добавить хотя бы одну ссылку на репозиторий'
-                                }
-                            },
-                            mods: {
-                                theme: 'islands',
-                                size: 'l',
-                                width: 'available',
-                                'has-clear': true
-                            },
-                            name: 'repositories',
-                            placeholder: 'organization/repo',
-                            autocomplete: true,
-                            tabIndex: 1
-                        }
-                    ]
-                },
-                {
-                    elem: 'field',
-                    mix: { block: 'app', elem: 'form-field' },
-                    elemMods: { id: 'repositories' },
-                    content: [
-                        {
-                            elem: 'label',
-                            content: 'Ссылка на репозиторий:'
-                        },
-                        {
-                            block: 'input',
-                            mods: {
-                                theme: 'islands',
-                                size: 'l',
-                                width: 'available',
-                                'has-clear': true
-                            },
-                            name: 'repositories',
-                            placeholder: 'organization/one-more-repo',
-                            autocomplete: true,
-                            tabIndex: 1
-                        }
-                    ]
-                },
+                reposFields,
                 {
                     elem: 'field',
                     mix: { block: 'app', elem: 'form-field' },
@@ -105,9 +94,9 @@ block('app-content').mod('view', 'config')(
                                 'has-clear': true
                             },
                             name: 'token',
+                            val: config.token,
                             placeholder: '7888f1e0edfd0f7517еe8cad83e448b088dba93c',
-                            autocomplete: true,
-                            tabIndex: 1
+                            tabIndex: 3
                         }
                     ]
                 },
@@ -115,7 +104,15 @@ block('app-content').mod('view', 'config')(
                     block: 'button',
                     mix: { block: 'app', elem: 'btn-config-submit' },
                     mods: { theme: 'islands', size: 'l', type: 'submit', view: 'action' },
-                    text: 'Применить'
+                    text: 'Применить',
+                    tabIndex: 4
+                },
+                {
+                    block: 'button',
+                    mix: { block: 'app', elem: 'btn-config-clear' },
+                    mods: { theme: 'islands', size: 'l', view: 'pseudo' },
+                    text: 'Очистить конфиг',
+                    tabIndex: 5
                 },
                 {
                     block : 'popup',

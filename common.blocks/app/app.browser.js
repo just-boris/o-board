@@ -10,6 +10,8 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
 
                     this.setMod('state', this._config ? 'loading' : 'config');
 
+                    this._getLinkChangeConfig().on('click', this._onClickLinkChangeConfig, this);
+
                     //this.channel('app').on('refresh', function(event) {
                     //    // берем фильтры
                     //    // обновляем весь контент, нахер сортировку, пока что.
@@ -19,8 +21,9 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
 
             state: {
                 config: function () {
-                    this._showContent({ block: 'app-content', mods: { view: 'config' } });
+                    this._buildConfigView();
                     this._getFormConfig().on('submit', this._onFormConfigSubmit, this);
+                    this._getBtnConfigClear().on('click', this._onClickBtnConfigClear, this);
                 },
 
                 loading: function () {
@@ -93,7 +96,38 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
 
             window.localStorage.setItem('config', JSON.stringify(this._config));
 
+            this._getFormConfig().un('submit', this._onFormConfigSubmit, this);
+
             this.setMod('state', 'loading');
+        },
+
+        _onClickLinkChangeConfig: function () {
+            this._clearCacheConfigBlocks();
+            this.setMod('state', 'config');
+            this._clearConfig();
+        },
+
+        _onClickBtnConfigClear: function () {
+            this._getBtnConfigClear().un('click', this._onClickBtnConfigClear, this);
+            this._clearCacheConfigBlocks();
+            this._buildConfigView();
+            this._getFormConfig().on('submit', this._onFormConfigSubmit, this);
+            this._getBtnConfigClear().on('click', this._onClickBtnConfigClear, this);
+        },
+
+        _clearConfig: function () {
+            delete this._config;
+            window.localStorage.removeItem('config');
+        },
+
+        _buildConfigView: function () {
+            var bemjson = {
+                block: 'app-content',
+                mods: { view: 'config' },
+                config: this._config
+            };
+
+            this._showContent(bemjson);
         },
 
         _getContent: function () {
@@ -110,6 +144,19 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
 
         _getFormConfig: function () {
             return this._formConfig || (this._formConfig = this.findBlockInside('form'));
+        },
+
+        _getLinkChangeConfig: function () {
+            return this._linkChangeConfig || (this._linkChangeConfig = this.findBlockInside('change-config', 'link'));
+        },
+
+        _getBtnConfigClear: function () {
+            return this._btnConfigClear || (this._btnConfigClear = this.findBlockInside('btn-config-clear', 'button'));
+        },
+
+        _clearCacheConfigBlocks: function () {
+            delete this._formConfig;
+            delete this._btnConfigClear;
         }
     }));
 });

@@ -11,6 +11,7 @@ modules.define('form',
                         );
 
                         if (this._getBtnAddField()) {
+                            console.log('yest button');
                             this._getBtnAddField().on('click', this._onBtnAddFieldClick, this);
                         }
                     }
@@ -20,7 +21,12 @@ modules.define('form',
             _onSubmit: function (e) {
                 e.preventDefault();
 
-                this._isValid() && this.emit('submit', this._getSerialize());
+                console.log('submit form');
+
+                if (this._isValid()) {
+                    console.log('isvalid');
+                    this.emit('submit', this._getSerialize());
+                }
 
                 return this;
             },

@@ -17,6 +17,7 @@
             'app-content',
             'github',
             { elems: [
+                'btn-config-clear',
                 'btn-config-submit',
                 'filter',
                 'form',
