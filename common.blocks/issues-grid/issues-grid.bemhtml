@@ -153,7 +153,7 @@ block('issues-grid').elem('comment-cell').match(function() {
     return [{
         block: 'link',
         mods: { theme: 'islands', size: 's' },
-        url: this.ctx.comment.author.url,
+        url: this.ctx.comment.author.issueUrl,
         content: this.xmlEscape('<' + this.ctx.comment.author.login + '>')
     }, ' ', this.moment(this.ctx.comment.date).fromNow()]
 });

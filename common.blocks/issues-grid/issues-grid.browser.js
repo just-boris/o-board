@@ -89,7 +89,7 @@ modules.define('issues-grid',
             },
 
             _commentsSorter: function(left, right) {
-
+                return moment(left.comment.date).valueOf() > moment(right.comment.date).valueOf();
             },
 
             _issueSorter: function(left, right) {
