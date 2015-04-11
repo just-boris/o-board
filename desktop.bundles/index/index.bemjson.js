@@ -20,11 +20,6 @@ module.exports = {
                 mix: { block: 'app', elem: 'header' },
                 title: 'User\'s issues'
             },
-            {
-                block: 'filter',
-                mix: { block: 'app', elem: 'filter' },
-                js: true
-            },
             // Обязательный элемент блока app,
             // в него будут вставляться таблицы
             {

@@ -11,11 +11,6 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
                     this.setMod('state', this._config ? 'loading' : 'config');
 
                     this._getLinkChangeConfig().on('click', this._onClickLinkChangeConfig, this);
-
-                    //this.channel('app').on('refresh', function(event) {
-                    //    // берем фильтры
-                    //    // обновляем весь контент, нахер сортировку, пока что.
-                    //});
                 }
             },
 
@@ -48,17 +43,24 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
                 },
 
                 content: function () {
-                    //this._showContent({
-                    //    tag: 'pre',
-                    //    content: JSON.stringify(this._issues, null, 4)
-                    //});
-
                     this._showContent({
                         block: 'app-content',
                         mods: { view: 'content' },
-                        issues: this._issues
+                        issues: this._issues,
+                        config: this._config
                     });
+
+                    this._getFilter().on('change', this._onFilterChange, this);
                 }
+            }
+        },
+
+        _onFilterChange: function (e, data) {
+            console.log('data', data);
+
+            if (this._issues) {
+                console.log('this._issues', this._issues);
+                var result = [];
             }
         },
 
@@ -152,6 +154,10 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
 
         _getBtnConfigClear: function () {
             return this._btnConfigClear || (this._btnConfigClear = this.findBlockInside('btn-config-clear', 'button'));
+        },
+
+        _getFilter: function () {
+            return this._filter || (this._filter = this.findBlockInside('filter', 'filter'));
         },
 
         _clearCacheConfigBlocks: function () {

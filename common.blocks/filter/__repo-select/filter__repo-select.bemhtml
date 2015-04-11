@@ -5,11 +5,16 @@ block('filter').elem('repo-select')(
     }),
 
     content()(function () {
+        var content = this.ctx.content,
+            ALL_REPOSITORIES = 'All repositories';
+
+        content.push(ALL_REPOSITORIES);
+
         return {
            block : 'select',
            mods : { mode : 'radio-check', theme : 'islands', size : 'm' },
            name : 'repo_select',
-           val : 2,
+           val : ALL_REPOSITORIES,
            text : 'Select repositories',
            options : this.ctx.content.map(function (item) {
                 return { val: item, text: item };

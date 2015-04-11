@@ -5,7 +5,8 @@ modules.define('filter', ['i-bem__dom'], function (provide, BEMDOM) {
         onSetMod: {
             js: {
                 inited: function () {
-                    ['repo-select', 'label-select']
+                    //['repo-select', 'label-select']
+                    ['repo-select']
                         .map(function (item) {
                             return this.findBlockInside(item, 'select');
                         }, this)
@@ -28,8 +29,8 @@ modules.define('filter', ['i-bem__dom'], function (provide, BEMDOM) {
 
         _onChange: function () {
             var selectElems = [
-                    ['repo-select', 'repository'],
-                    ['label-select', 'label']
+                    ['repo-select', 'repository']
+                    //['label-select', 'label']
                 ],
                 checkboxElems = [
                     ['issue-check', 'issues'],

@@ -1,13 +1,18 @@
 block('filter')(
+
+    js()(true),
+
     content()(function () {
+        var config = this.ctx.config;
+
         return [
-            { elem: 'repo-select', content: this.ctx.repositories || [] },
+            { elem: 'repo-select', content: config.repositories || [] },
             { elem: 'issue-check' },
             { elem: 'pr-check' },
             { elem: 'delimeter' },
             { elem: 'assign-check' },
             { elem: 'delimeter' },
-            { elem: 'label-select', content: this.ctx.label || [] },
+            //{ elem: 'label-select', content: this.ctx.label || [] },
             { elem: 'date-input' }
         ];
     })
