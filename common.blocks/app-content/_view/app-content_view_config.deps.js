@@ -1,4 +1,4 @@
-[
+([
     {
         tech: 'js',
         mustDeps: [
@@ -25,6 +25,9 @@
                 block: 'form'
             },
             {
+                block: 'field'
+            },
+            {
                 block: 'input',
                 mods: {
                     theme: 'islands',
@@ -39,4 +42,4 @@
             }
         ]
     }
-]
+])

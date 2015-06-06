@@ -1,6 +1,7 @@
 modules.define('form',
     ['i-bem__dom', 'jquery', 'BEMHTML'],
     function (provide, BEMDOM, $, BEMHTML) {
+        "use strict";
         provide(BEMDOM.decl(this.name, {
             onSetMod: {
                 js: {
@@ -11,9 +12,10 @@ modules.define('form',
                         );
 
                         if (this._getBtnAddField()) {
-                            console.log('yest button');
                             this._getBtnAddField().on('click', this._onBtnAddFieldClick, this);
                         }
+
+                        this._getFormFields().forEach(this._onAddNewInput, this);
                     }
                 }
             },
@@ -21,20 +23,21 @@ modules.define('form',
             _onSubmit: function (e) {
                 e.preventDefault();
 
-                console.log('submit form');
 
                 if (this._isValid()) {
-                    console.log('isvalid');
+                    console.log('submit form');
                     this.emit('submit', this._getSerialize());
+                } else {
+                    console.log('invalid');
                 }
 
                 return this;
             },
 
-            _onError: function (control, input) {
+            _onError: function (input) {
                 this._getPopup()
                     .setAnchor(input)
-                    .setContent(this.elemParams($(control)).errorMessage)
+                    .setContent(this.elemParams(input).errorMessage)
                     .setMod('visible', true);
             },
 
@@ -42,33 +45,27 @@ modules.define('form',
                 this._getPopup().delMod('visible');
             },
 
-            _onBtnAddFieldClick: function () {
-                var bemjson = {
-                    elem: 'field',
-                    mix: { block: 'app', elem: 'form-field' },
-                    elemMods: { id: 'repositories' },
-                    content: [
-                        {
-                            elem: 'label',
-                            content: 'Ссылка на репозиторий:'
-                        },
-                        {
-                            block: 'input',
-                            mods: {
-                                theme: 'islands',
-                                size: 'l',
-                                width: 'available',
-                                'has-clear': true
-                            },
-                            name: 'repositories',
-                            placeholder: 'organization/one-more-repo',
-                            autocomplete: true,
-                            tabIndex: 1
-                        }
-                    ]
-                };
+            _onAddNewInput: function(field) {
+                field.on('remove', this._onRemoveField, this);
+            },
 
-                BEMDOM.after(this.elem('field', 'id', 'repositories').last(), BEMHTML.apply(bemjson));
+            _onRemoveField: function(e, field) {
+                this._getPopup().delMod('visible');
+                if(this._getFormFields().length === 1) {
+                    this._onError(this.findBlockInside(field.domElem, 'input').domElem);
+                } else {
+                    BEMDOM.destruct(field.domElem);
+                }
+            },
+
+            _onBtnAddFieldClick: function () {
+                var fieldsCount = this._getFormFields().length;
+                BEMDOM.append(this.elem('repositories'), BEMHTML.apply({
+                    block: 'field',
+                    first: fieldsCount === 0,
+                    index: fieldsCount
+                }));
+                this._onAddNewInput(this._getFormFields().pop());
             },
 
             /**
@@ -77,27 +74,23 @@ modules.define('form',
              * @returns {boolean}
              */
             _isValid: function () {
-                var _this = this,
-                    $controls = this.findElem('control', 'required', true),
-                    resultCheck = true,
-                    input;
-
-                $controls.each(function (idx, control) {
-                    input = _this.findBlockInside($(control), 'input');
-
-                    if (input && !input.getVal()) {
-
-                        _this._onError(control, input);
-
-                        resultCheck = false;
-
-                        // after find goal elem - exit from $.each()
+                var repoFields = this.findElem('field', 'name', 'repositories'),
+                    invalidField;
+                repoFields.each(function(i, input) {
+                    if(!this.findBlockInside($(input), 'input').getVal()) {
+                        invalidField = $(input);
                         return false;
                     }
+                }.bind(this));
+                if(invalidField) {
+                    return this._onError(invalidField);
+                }
 
-                });
-
-                return resultCheck;
+                var tokenField = this.findElem('field', 'name', 'token');
+                if(!this.findBlockInside(tokenField, 'input').getVal()) {
+                    return this._onError(tokenField);
+                }
+                return true;
             },
 
             /**
@@ -115,6 +108,10 @@ modules.define('form',
 
             _getBtnAddField: function () {
                 return this._btnAddField || (this._btnAddField = this.findBlockInside('field-add', 'button'));
+            },
+
+            _getFormFields: function() {
+                return this.findBlocksInside('field');
             }
         }));
     });

@@ -1,0 +1,40 @@
+block('field')(
+    mix()({
+        block: 'form',
+        elem: 'field'
+    }),
+    content()(function() {
+        return [{
+            elem: 'label',
+            content: 'Repository link:'
+        }, {
+            block: 'control-group',
+            mods: {flex: true},
+            content: [
+                {
+                    block: 'input',
+                    mods: {
+                        theme: 'islands',
+                        size: 'l',
+                        width: 'available',
+                        'has-clear': true
+                    },
+                    name: 'repositories',
+                    val: this.ctx.value,
+                    placeholder: this.ctx.first ? 'organization/one-more-repo' : 'organization/repo',
+                    tabIndex: this.ctx.index
+                },
+                {
+                    block: 'button',
+                    mods: {theme: 'islands', size: 'l'},
+                    mix: {block: 'field', elem: 'remove'},
+                    icon: {
+                        block: 'fa',
+                        mix: {block: 'icon'},
+                        icon: 'remove'
+                    }
+                }
+            ]
+        }];
+    })
+);

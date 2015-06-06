@@ -1,50 +1,12 @@
 block('app-content').mod('view', 'config')(
     content()(function () {
+        "use strict";
         var config = this.ctx.config;
 
         if (!config) config = {};
         if (!config.repositories) config.repositories = ['', ''];
 
-
-
-        var reposFields = config.repositories.map(function (item, idx) {
-
-            var id = idx + 1;
-
-            return {
-                block: 'form',
-                elem: 'field',
-                mix: { block: 'app', elem: 'form-field' },
-                elemMods: { id: 'repositories' },
-                content: [
-                    {
-                        elem: 'label',
-                        content: 'Repository link:'
-                    },
-                    {
-                        block: 'input',
-                        mix: id === 1 ? {
-                            block: 'form',
-                            elem: 'control',
-                            elemMods: { required: true },
-                            js: {
-                                errorMessage: 'You need to add at least one link'
-                            }
-                        } : undefined,
-                        mods: {
-                            theme: 'islands',
-                            size: 'l',
-                            width: 'available',
-                            'has-clear': true
-                        },
-                        name: 'repositories',
-                        val: item,
-                        placeholder: id % 2 === 0 ? 'organization/one-more-repo' : 'organization/repo',
-                        tabIndex: id
-                    }
-                ]
-            }
-        });
+        this.ctx.js = config;
 
         return {
             block: 'form',
@@ -55,17 +17,33 @@ block('app-content').mod('view', 'config')(
                     mods: { level: 4 },
                     content: 'Settings:'
                 },
-                reposFields,
+                {
+                    elem: 'repositories',
+                    content: config.repositories.map(function (item, idx) {
+                        return {
+                            block: 'field',
+                            mix: {
+                                block: 'form', elem: 'field', elemMods: {name: 'repositories'},
+                                js: {
+                                    errorMessage: 'You need to add at least one repo'
+                                }
+                            },
+                            value: item,
+                            first: idx === 0,
+                            index: idx
+                        };
+                    })
+                },
                 {
                     elem: 'field',
                     mix: { block: 'app', elem: 'form-field' },
                     content: {
                         block: 'button',
-                        mix: { block: 'form', elem: 'field-add', js: { id: 'repositories' } },
-                        mods: { theme: 'islands', size: 's' },
+                        mix: { block: 'form', elem: 'field-add' },
+                        mods: { theme: 'islands', size: 'm' },
                         icon: {
                             block: 'fa',
-                            mix: { block: 'app', elem: 'icon-field-add' },
+                            mix: { block: 'icon' },
                             icon: 'plus'
                         },
                         text: 'Add repository'
@@ -73,21 +51,23 @@ block('app-content').mod('view', 'config')(
                 },
                 {
                     elem: 'field',
+                    elemMods: {name: 'token'},
                     mix: { block: 'app', elem: 'form-field' },
+                    js: {
+                        errorMessage: 'User token is required to application'
+                    },
                     content: [
                         {
                             elem: 'label',
-                            content: 'Generate user token <a href="https://github.com/settings/tokens/new">on this page</a> and paste here. Do not forget to check <code>admin:org</code> permission'
+                            content: 'Generate user token <a href="https://github.com/settings/tokens/new">on this page</a>' +
+                            ' and paste it here. Do not forget to check <code>admin:org</code> permission'
                         },
                         {
                             block: 'input',
                             mix: {
                                 block: 'form',
                                 elem: 'control',
-                                elemMods: { required: true },
-                                js: {
-                                    errorMessage: 'User token is required to application'
-                                }
+                                elemMods: { required: true }
                             },
                             mods: {
                                 theme: 'islands',
@@ -113,7 +93,7 @@ block('app-content').mod('view', 'config')(
                     block: 'button',
                     mix: { block: 'app', elem: 'btn-config-clear' },
                     mods: { theme: 'islands', size: 'l', view: 'pseudo' },
-                    text: 'Clear congfig',
+                    text: 'Clear config',
                     tabIndex: 5
                 },
                 {
