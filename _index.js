@@ -8401,6 +8401,31 @@ provide($);
 });
 
 /* end: ../../libs/bem-core/common.blocks/jquery/__event/_type/jquery__event_type_pointerpressrelease.js */
+/* begin: ../../common.blocks/field/field.js */
+modules.define('field',
+    ['i-bem__dom'],
+    function(provide, BEMDOM) {
+        "use strict";
+        provide(BEMDOM.decl(this.name, {
+            onSetMod: {
+                js: {
+                    inited: function() {
+                        this.findElem('remove').on('click', this._onRemoveClick.bind(this));
+                    }
+                }
+            },
+
+            _onRemoveClick: function() {
+                this.emit('remove', this);
+            },
+
+            getValue: function() {
+                return this.findElem('control').val();
+            }
+        }));
+    });
+
+/* end: ../../common.blocks/field/field.js */
 /* begin: ../../libs/bem-components/design/common.blocks/popup/_theme/popup_theme_islands.js */
 modules.define('popup', ['objects'], function(provide, objects, Popup) {
 
@@ -12465,6 +12490,7 @@ modules.define('perdula',
 modules.define('form',
     ['i-bem__dom', 'jquery', 'BEMHTML'],
     function (provide, BEMDOM, $, BEMHTML) {
+        "use strict";
         provide(BEMDOM.decl(this.name, {
             onSetMod: {
                 js: {
@@ -12475,9 +12501,10 @@ modules.define('form',
                         );
 
                         if (this._getBtnAddField()) {
-                            console.log('yest button');
                             this._getBtnAddField().on('click', this._onBtnAddFieldClick, this);
                         }
+
+                        this._getFormFields().forEach(this._onAddNewInput, this);
                     }
                 }
             },
@@ -12485,20 +12512,21 @@ modules.define('form',
             _onSubmit: function (e) {
                 e.preventDefault();
 
-                console.log('submit form');
 
                 if (this._isValid()) {
-                    console.log('isvalid');
+                    console.log('submit form');
                     this.emit('submit', this._getSerialize());
+                } else {
+                    console.log('invalid');
                 }
 
                 return this;
             },
 
-            _onError: function (control, input) {
+            _onError: function (input) {
                 this._getPopup()
                     .setAnchor(input)
-                    .setContent(this.elemParams($(control)).errorMessage)
+                    .setContent(this.elemParams(input).errorMessage)
                     .setMod('visible', true);
             },
 
@@ -12506,33 +12534,27 @@ modules.define('form',
                 this._getPopup().delMod('visible');
             },
 
-            _onBtnAddFieldClick: function () {
-                var bemjson = {
-                    elem: 'field',
-                    mix: { block: 'app', elem: 'form-field' },
-                    elemMods: { id: 'repositories' },
-                    content: [
-                        {
-                            elem: 'label',
-                            content: 'Ссылка на репозиторий:'
-                        },
-                        {
-                            block: 'input',
-                            mods: {
-                                theme: 'islands',
-                                size: 'l',
-                                width: 'available',
-                                'has-clear': true
-                            },
-                            name: 'repositories',
-                            placeholder: 'organization/one-more-repo',
-                            autocomplete: true,
-                            tabIndex: 1
-                        }
-                    ]
-                };
+            _onAddNewInput: function(field) {
+                field.on('remove', this._onRemoveField, this);
+            },
 
-                BEMDOM.after(this.elem('field', 'id', 'repositories').last(), BEMHTML.apply(bemjson));
+            _onRemoveField: function(e, field) {
+                this._getPopup().delMod('visible');
+                if(this._getFormFields().length === 1) {
+                    this._onError(this.findBlockInside(field.domElem, 'input').domElem);
+                } else {
+                    BEMDOM.destruct(field.domElem);
+                }
+            },
+
+            _onBtnAddFieldClick: function () {
+                var fieldsCount = this._getFormFields().length;
+                BEMDOM.append(this.elem('repositories'), BEMHTML.apply({
+                    block: 'field',
+                    first: fieldsCount === 0,
+                    index: fieldsCount
+                }));
+                this._onAddNewInput(this._getFormFields().pop());
             },
 
             /**
@@ -12541,27 +12563,23 @@ modules.define('form',
              * @returns {boolean}
              */
             _isValid: function () {
-                var _this = this,
-                    $controls = this.findElem('control', 'required', true),
-                    resultCheck = true,
-                    input;
-
-                $controls.each(function (idx, control) {
-                    input = _this.findBlockInside($(control), 'input');
-
-                    if (input && !input.getVal()) {
-
-                        _this._onError(control, input);
-
-                        resultCheck = false;
-
-                        // after find goal elem - exit from $.each()
+                var repoFields = this.findElem('field', 'name', 'repositories'),
+                    invalidField;
+                repoFields.each(function(i, input) {
+                    if(!this.findBlockInside($(input), 'input').getVal()) {
+                        invalidField = $(input);
                         return false;
                     }
+                }.bind(this));
+                if(invalidField) {
+                    return this._onError(invalidField);
+                }
 
-                });
-
-                return resultCheck;
+                var tokenField = this.findElem('field', 'name', 'token');
+                if(!this.findBlockInside(tokenField, 'input').getVal()) {
+                    return this._onError(tokenField);
+                }
+                return true;
             },
 
             /**
@@ -12579,6 +12597,10 @@ modules.define('form',
 
             _getBtnAddField: function () {
                 return this._btnAddField || (this._btnAddField = this.findBlockInside('field-add', 'button'));
+            },
+
+            _getFormFields: function() {
+                return this.findBlocksInside('field');
             }
         }));
     });
@@ -12883,8 +12905,6 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
             state: {
                 config: function () {
                     this._buildConfigView();
-                    this._getFormConfig().on('submit', this._onFormConfigSubmit, this);
-                    this._getBtnConfigClear().on('click', this._onClickBtnConfigClear, this);
                 },
 
                 loading: function () {
@@ -13020,15 +13040,11 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
         _onClickLinkChangeConfig: function () {
             this._clearCacheConfigBlocks();
             this.setMod('state', 'config');
-            this._clearConfig();
         },
 
         _onClickBtnConfigClear: function () {
-            this._getBtnConfigClear().un('click', this._onClickBtnConfigClear, this);
-            this._clearCacheConfigBlocks();
+            this._clearConfig();
             this._buildConfigView();
-            this._getFormConfig().on('submit', this._onFormConfigSubmit, this);
-            this._getBtnConfigClear().on('click', this._onClickBtnConfigClear, this);
         },
 
         _clearConfig: function () {
@@ -13044,6 +13060,9 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
             };
 
             this._showContent(bemjson);
+
+            this._getFormConfig().on('submit', this._onFormConfigSubmit, this);
+            this._getBtnConfigClear().on('click', this._onClickBtnConfigClear, this);
         },
 
         _getContent: function () {
@@ -13124,6 +13143,13 @@ function applyc(__$ctx, __$ref) {
                     elem: "control"
                 };
             }
+        } else if (__$t === "field") {
+            if (!$$elem) {
+                return {
+                    block: "form",
+                    elem: "field"
+                };
+            }
         } else if (__$t === "link") {
             if (!$$elem) {
                 return [ {
@@ -13182,28 +13208,28 @@ function applyc(__$ctx, __$ref) {
         return undefined;
     } else if (__$t === "cls") {
         if ($$block === "fa" && !$$elem) {
-            var __$r = __$b134(__$ctx, __$ref);
+            var __$r = __$b136(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
         return undefined;
     } else if (__$t === "") {
         if (__$ctx.ctx && __$ctx.ctx._vow && (__$ctx.__$a0 & 2097152) === 0) {
-            var __$r = __$b136(__$ctx, __$ref);
-            if (__$r !== __$ref) return __$r;
-        }
-        if (__$ctx.isSimple(__$ctx.ctx)) {
-            var __$r = __$b137(__$ctx, __$ref);
-            if (__$r !== __$ref) return __$r;
-        }
-        if (!__$ctx.ctx) {
             var __$r = __$b138(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
-        if (__$ctx.isArray(__$ctx.ctx)) {
+        if (__$ctx.isSimple(__$ctx.ctx)) {
             var __$r = __$b139(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
-        var __$r = __$b140(__$ctx, __$ref);
+        if (!__$ctx.ctx) {
+            var __$r = __$b140(__$ctx, __$ref);
+            if (__$r !== __$ref) return __$r;
+        }
+        if (__$ctx.isArray(__$ctx.ctx)) {
+            var __$r = __$b141(__$ctx, __$ref);
+            if (__$r !== __$ref) return __$r;
+        }
+        var __$r = __$b142(__$ctx, __$ref);
         if (__$r !== __$ref) return __$r;
     }
 }
@@ -13414,77 +13440,39 @@ function applyc(__$ctx, __$ref) {
 });
 
 function __$b5(__$ctx, __$ref) {
-    var ctx__$119 = __$ctx.ctx;
+    var ctx__$117 = __$ctx.ctx;
     return {
-        name: ctx__$119.name,
-        optionsMaxHeight: ctx__$119.optionsMaxHeight
+        name: ctx__$117.name,
+        optionsMaxHeight: ctx__$117.optionsMaxHeight
     };
 }
 
 function __$b11(__$ctx, __$ref) {
-    var ctx__$51 = __$ctx.ctx;
+    var ctx__$49 = __$ctx.ctx;
     return {
-        year: ctx__$51.year,
-        month: ctx__$51.month,
-        date: ctx__$51.date
+        year: ctx__$49.year,
+        month: ctx__$49.month,
+        date: ctx__$49.date
     };
 }
 
 function __$b17(__$ctx, __$ref) {
-    var ctx__$140 = __$ctx.ctx;
+    var ctx__$138 = __$ctx.ctx;
     return {
-        mainOffset: ctx__$140.mainOffset,
-        secondaryOffset: ctx__$140.secondaryOffset,
-        viewportOffset: ctx__$140.viewportOffset,
-        directions: ctx__$140.directions,
-        zIndexGroupLevel: ctx__$140.zIndexGroupLevel
+        mainOffset: ctx__$138.mainOffset,
+        secondaryOffset: ctx__$138.secondaryOffset,
+        viewportOffset: ctx__$138.viewportOffset,
+        directions: ctx__$138.directions,
+        zIndexGroupLevel: ctx__$138.zIndexGroupLevel
     };
 }
 
 function __$b21(__$ctx, __$ref) {
+    "use strict";
     var config__$0 = __$ctx.ctx.config;
     if (!config__$0) config__$0 = {};
     if (!config__$0.repositories) config__$0.repositories = [ "", "" ];
-    var reposFields__$1 = config__$0.repositories.map(function(item, idx) {
-        var id__$2 = idx + 1;
-        return {
-            block: "form",
-            elem: "field",
-            mix: {
-                block: "app",
-                elem: "form-field"
-            },
-            elemMods: {
-                id: "repositories"
-            },
-            content: [ {
-                elem: "label",
-                content: "Ссылка на репозиторий:"
-            }, {
-                block: "input",
-                mix: id__$2 === 1 ? {
-                    block: "form",
-                    elem: "control",
-                    elemMods: {
-                        required: true
-                    },
-                    js: {
-                        errorMessage: "Необходимо добавить хотя бы одну ссылку на репозиторий"
-                    }
-                } : undefined,
-                mods: {
-                    theme: "islands",
-                    size: "l",
-                    width: "available",
-                    "has-clear": true
-                },
-                name: "repositories",
-                val: item,
-                placeholder: id__$2 % 2 === 0 ? "organization/one-more-repo" : "organization/repo",
-                tabIndex: id__$2
-            } ]
-        };
-    });
+    __$ctx.ctx.js = config__$0;
     return {
         block: "form",
         mix: {
@@ -13496,8 +13484,28 @@ function __$b21(__$ctx, __$ref) {
             mods: {
                 level: 4
             },
-            content: "Настройки:"
-        }, reposFields__$1, {
+            content: "Settings:"
+        }, {
+            elem: "repositories",
+            content: config__$0.repositories.map(function(item, idx) {
+                return {
+                    block: "field",
+                    mix: {
+                        block: "form",
+                        elem: "field",
+                        elemMods: {
+                            name: "repositories"
+                        },
+                        js: {
+                            errorMessage: "You need to add at least one repo"
+                        }
+                    },
+                    value: item,
+                    first: idx === 0,
+                    index: idx
+                };
+            })
+        }, {
             elem: "field",
             mix: {
                 block: "app",
@@ -13507,34 +13515,36 @@ function __$b21(__$ctx, __$ref) {
                 block: "button",
                 mix: {
                     block: "form",
-                    elem: "field-add",
-                    js: {
-                        id: "repositories"
-                    }
+                    elem: "field-add"
                 },
                 mods: {
                     theme: "islands",
-                    size: "s"
+                    size: "m"
                 },
                 icon: {
                     block: "fa",
                     mix: {
-                        block: "app",
-                        elem: "icon-field-add"
+                        block: "icon"
                     },
                     icon: "plus"
                 },
-                text: "Еще репозиторий"
+                text: "Add repository"
             }
         }, {
             elem: "field",
+            elemMods: {
+                name: "token"
+            },
             mix: {
                 block: "app",
                 elem: "form-field"
             },
+            js: {
+                errorMessage: "User token is required to application"
+            },
             content: [ {
                 elem: "label",
-                content: 'Сгенерируйте персональный <a href="https://help.github.com/articles/creating-an-access-token-for-command-line-use/" target="_blank">токен</a>, обязательный для работы приложения:'
+                content: 'Generate user token <a href="https://github.com/settings/tokens/new">on this page</a>' + " and paste it here. Do not forget to check <code>admin:org</code> permission"
             }, {
                 block: "input",
                 mix: {
@@ -13542,9 +13552,6 @@ function __$b21(__$ctx, __$ref) {
                     elem: "control",
                     elemMods: {
                         required: true
-                    },
-                    js: {
-                        errorMessage: "Персональный токен доступа обязателен для заполнения"
                     }
                 },
                 mods: {
@@ -13570,7 +13577,7 @@ function __$b21(__$ctx, __$ref) {
                 type: "submit",
                 view: "action"
             },
-            text: "Применить",
+            text: "Save",
             tabIndex: 4
         }, {
             block: "button",
@@ -13583,7 +13590,7 @@ function __$b21(__$ctx, __$ref) {
                 size: "l",
                 view: "pseudo"
             },
-            text: "Очистить конфиг",
+            text: "Clear config",
             tabIndex: 5
         }, {
             block: "popup",
@@ -13601,71 +13608,71 @@ function __$b21(__$ctx, __$ref) {
 }
 
 function __$b32(__$ctx, __$ref) {
-    var ctx__$98 = __$ctx.ctx, content__$99 = [ ctx__$98.icon ];
-    "text" in ctx__$98 && content__$99.push({
+    var ctx__$96 = __$ctx.ctx, content__$97 = [ ctx__$96.icon ];
+    "text" in ctx__$96 && content__$97.push({
         elem: "text",
-        content: ctx__$98.text
+        content: ctx__$96.text
     });
-    return content__$99;
+    return content__$97;
 }
 
-function __$b33(__$ctx, __$ref) {
-    var message__$25 = "";
+function __$b34(__$ctx, __$ref) {
+    var message__$23 = "";
     switch (__$ctx.ctx.type) {
       case "comment":
-        message__$25 = "commented";
+        message__$23 = "commented";
         break;
 
       case "create":
-        message__$25 = "create issue";
+        message__$23 = "create issue";
         break;
 
       case "commit":
-        message__$25 = "push commit";
+        message__$23 = "push commit";
         break;
 
       case "pull":
-        message__$25 = "make pull request";
+        message__$23 = "make pull request";
         break;
     }
-    return message__$25 ? " " + message__$25 + " " : "";
+    return message__$23 ? " " + message__$23 + " " : "";
 }
 
-function __$b45(__$ctx, __$ref) {
-    var _ctx__$26 = __$ctx._ctx, year__$27 = _ctx__$26.year, month__$28 = _ctx__$26.month - 1, firstDayOfMonth__$29 = new Date(year__$27, month__$28, 1).getDay(), now__$30 = new Date(), currentDateString__$31 = [ now__$30.getFullYear(), now__$30.getMonth(), now__$30.getDate() ].join("."), selectedDateString__$32 = [ year__$27, month__$28, _ctx__$26.date ].join(".");
-    if (firstDayOfMonth__$29 === 0) firstDayOfMonth__$29 = 7;
-    var daysInMonth__$33 = new Date(year__$27, month__$28 + 1, 0).getDate(), weekCount__$34 = Math.ceil((daysInMonth__$33 + firstDayOfMonth__$29 - 1) / 7), result__$35 = [];
-    for (var i__$36 = 0; i__$36 < weekCount__$34; i__$36++) {
-        var row__$37 = [];
-        for (var j__$38 = 1; j__$38 <= 7; j__$38++) {
-            var date__$39 = i__$36 * 7 + j__$38 - firstDayOfMonth__$29 + 1, dateValue__$40 = new Date(year__$27, month__$28, date__$39).getDate(), dateString__$41 = [ year__$27, month__$28, date__$39 ].join(".");
-            row__$37.push({
+function __$b46(__$ctx, __$ref) {
+    var _ctx__$24 = __$ctx._ctx, year__$25 = _ctx__$24.year, month__$26 = _ctx__$24.month - 1, firstDayOfMonth__$27 = new Date(year__$25, month__$26, 1).getDay(), now__$28 = new Date(), currentDateString__$29 = [ now__$28.getFullYear(), now__$28.getMonth(), now__$28.getDate() ].join("."), selectedDateString__$30 = [ year__$25, month__$26, _ctx__$24.date ].join(".");
+    if (firstDayOfMonth__$27 === 0) firstDayOfMonth__$27 = 7;
+    var daysInMonth__$31 = new Date(year__$25, month__$26 + 1, 0).getDate(), weekCount__$32 = Math.ceil((daysInMonth__$31 + firstDayOfMonth__$27 - 1) / 7), result__$33 = [];
+    for (var i__$34 = 0; i__$34 < weekCount__$32; i__$34++) {
+        var row__$35 = [];
+        for (var j__$36 = 1; j__$36 <= 7; j__$36++) {
+            var date__$37 = i__$34 * 7 + j__$36 - firstDayOfMonth__$27 + 1, dateValue__$38 = new Date(year__$25, month__$26, date__$37).getDate(), dateString__$39 = [ year__$25, month__$26, date__$37 ].join(".");
+            row__$35.push({
                 elem: "day",
                 elemMods: {
-                    month: date__$39 < 1 ? "prev" : date__$39 > daysInMonth__$33 ? "next" : "current",
-                    weekend: j__$38 > 5,
-                    today: currentDateString__$31 === dateString__$41,
-                    selected: selectedDateString__$32 === dateString__$41
+                    month: date__$37 < 1 ? "prev" : date__$37 > daysInMonth__$31 ? "next" : "current",
+                    weekend: j__$36 > 5,
+                    today: currentDateString__$29 === dateString__$39,
+                    selected: selectedDateString__$30 === dateString__$39
                 },
                 js: {
-                    date: dateValue__$40
+                    date: dateValue__$38
                 },
                 content: {
                     elem: "date",
-                    content: dateValue__$40
+                    content: dateValue__$38
                 }
             });
         }
-        result__$35.push({
+        result__$33.push({
             elem: "row",
-            content: row__$37
+            content: row__$35
         });
     }
-    return result__$35;
+    return result__$33;
 }
 
-function __$b48(__$ctx, __$ref) {
-    var _ctx__$42 = __$ctx._ctx, monthNames__$43 = {
+function __$b49(__$ctx, __$ref) {
+    var _ctx__$40 = __$ctx._ctx, monthNames__$41 = {
         1: "jan",
         2: "feb",
         3: "mar",
@@ -13687,7 +13694,7 @@ function __$b48(__$ctx, __$ref) {
         content: "<"
     }, {
         elem: "month-display",
-        content: [ monthNames__$43[_ctx__$42.month], " ", _ctx__$42.year ]
+        content: [ monthNames__$41[_ctx__$40.month], " ", _ctx__$40.year ]
     }, {
         elem: "month-switch",
         elemMods: {
@@ -13697,32 +13704,32 @@ function __$b48(__$ctx, __$ref) {
     } ];
 }
 
-function __$b49(__$ctx, __$ref) {
-    var ctx__$50 = __$ctx.ctx;
+function __$b50(__$ctx, __$ref) {
+    var ctx__$48 = __$ctx.ctx;
     return {
         elem: "content",
-        year: ctx__$50.year,
-        month: ctx__$50.month,
-        date: ctx__$50.date
+        year: ctx__$48.year,
+        month: ctx__$48.month,
+        date: ctx__$48.date
     };
 }
 
-function __$b50(__$ctx, __$ref) {
-    var ctx__$54 = __$ctx.ctx, mods__$55 = $$mods;
+function __$b51(__$ctx, __$ref) {
+    var ctx__$52 = __$ctx.ctx, mods__$53 = $$mods;
     return [ {
         elem: "box",
         content: {
             elem: "control",
-            checked: mods__$55.checked,
-            disabled: mods__$55.disabled,
-            name: ctx__$54.name,
-            val: ctx__$54.val
+            checked: mods__$53.checked,
+            disabled: mods__$53.disabled,
+            name: ctx__$52.name,
+            val: ctx__$52.val
         }
-    }, ctx__$54.text ];
+    }, ctx__$52.text ];
 }
 
-function __$b57(__$ctx, __$ref) {
-    var content__$137 = __$ctx.ctx.content, ALL_REPOSITORIES__$138 = "All repositories";
+function __$b58(__$ctx, __$ref) {
+    var content__$135 = __$ctx.ctx.content, ALL_REPOSITORIES__$136 = "All repositories";
     return {
         block: "select",
         mods: {
@@ -13731,9 +13738,9 @@ function __$b57(__$ctx, __$ref) {
             size: "m"
         },
         name: "repo_select",
-        val: ALL_REPOSITORIES__$138,
+        val: ALL_REPOSITORIES__$136,
         text: "Select repositories",
-        options: __$ctx.ctx.content.concat(ALL_REPOSITORIES__$138).map(function(item) {
+        options: __$ctx.ctx.content.concat(ALL_REPOSITORIES__$136).map(function(item) {
             return {
                 val: item,
                 text: item
@@ -13742,11 +13749,11 @@ function __$b57(__$ctx, __$ref) {
     };
 }
 
-function __$b58(__$ctx, __$ref) {
-    var config__$139 = __$ctx.ctx.config;
+function __$b59(__$ctx, __$ref) {
+    var config__$137 = __$ctx.ctx.config;
     return [ {
         elem: "repo-select",
-        content: config__$139.repositories || []
+        content: config__$137.repositories || []
     }, {
         elem: "issue-check"
     }, {
@@ -13758,148 +13765,148 @@ function __$b58(__$ctx, __$ref) {
     } ];
 }
 
-function __$b61(__$ctx, __$ref) {
-    var stack__$174 = __$ctx.ctx.stack;
-    return stack__$174 ? stack__$174.map(function(icon) {
+function __$b62(__$ctx, __$ref) {
+    var stack__$172 = __$ctx.ctx.stack;
+    return stack__$172 ? stack__$172.map(function(icon) {
         icon.block = "fa";
         icon.__instack = true;
         return icon;
     }) : __$ctx.ctx.content;
 }
 
-function __$b64(__$ctx, __$ref) {
-    var input__$141 = __$ctx._input, attrs__$142 = {
-        id: input__$141.id,
-        name: input__$141.name,
-        value: input__$141.val,
-        maxlength: input__$141.maxLength,
-        tabindex: input__$141.tabIndex,
-        placeholder: input__$141.placeholder
+function __$b65(__$ctx, __$ref) {
+    var input__$139 = __$ctx._input, attrs__$140 = {
+        id: input__$139.id,
+        name: input__$139.name,
+        value: input__$139.val,
+        maxlength: input__$139.maxLength,
+        tabindex: input__$139.tabIndex,
+        placeholder: input__$139.placeholder
     };
-    input__$141.autocomplete === false && (attrs__$142.autocomplete = "off");
-    $$mods.disabled && (attrs__$142.disabled = "disabled");
-    return attrs__$142;
-}
-
-function __$b66(__$ctx, __$ref) {
-    var ctx__$100 = __$ctx.ctx, attrs__$101 = {
-        type: $$mods.type || "button",
-        name: ctx__$100.name,
-        value: ctx__$100.val
-    };
-    $$mods.disabled && (attrs__$101.disabled = "disabled");
-    return __$ctx.extend(function __$lb__$102() {
-        var __$r__$103;
-        var __$l0__$104 = __$ctx.__$a0;
-        __$ctx.__$a0 = __$ctx.__$a0 | 16384;
-        __$r__$103 = applyc(__$ctx, __$ref);
-        __$ctx.__$a0 = __$l0__$104;
-        return __$r__$103;
-    }(), attrs__$101);
+    input__$139.autocomplete === false && (attrs__$140.autocomplete = "off");
+    $$mods.disabled && (attrs__$140.disabled = "disabled");
+    return attrs__$140;
 }
 
 function __$b67(__$ctx, __$ref) {
-    var ctx__$105 = __$ctx.ctx;
-    return {
-        role: "button",
-        tabindex: ctx__$105.tabIndex,
-        id: ctx__$105.id,
-        title: ctx__$105.title
+    var ctx__$98 = __$ctx.ctx, attrs__$99 = {
+        type: $$mods.type || "button",
+        name: ctx__$98.name,
+        value: ctx__$98.val
     };
+    $$mods.disabled && (attrs__$99.disabled = "disabled");
+    return __$ctx.extend(function __$lb__$100() {
+        var __$r__$101;
+        var __$l0__$102 = __$ctx.__$a0;
+        __$ctx.__$a0 = __$ctx.__$a0 | 16384;
+        __$r__$101 = applyc(__$ctx, __$ref);
+        __$ctx.__$a0 = __$l0__$102;
+        return __$r__$101;
+    }(), attrs__$99);
 }
 
 function __$b68(__$ctx, __$ref) {
-    var ctx__$18 = __$ctx.ctx, attrs__$19 = {}, tabIndex__$20;
+    var ctx__$103 = __$ctx.ctx;
+    return {
+        role: "button",
+        tabindex: ctx__$103.tabIndex,
+        id: ctx__$103.id,
+        title: ctx__$103.title
+    };
+}
+
+function __$b69(__$ctx, __$ref) {
+    var ctx__$16 = __$ctx.ctx, attrs__$17 = {}, tabIndex__$18;
     if (!$$mods.disabled) {
-        if (ctx__$18.url) {
-            attrs__$19.href = ctx__$18.url;
-            tabIndex__$20 = ctx__$18.tabIndex;
+        if (ctx__$16.url) {
+            attrs__$17.href = ctx__$16.url;
+            tabIndex__$18 = ctx__$16.tabIndex;
         } else {
-            tabIndex__$20 = ctx__$18.tabIndex || 0;
+            tabIndex__$18 = ctx__$16.tabIndex || 0;
         }
     }
-    typeof tabIndex__$20 === "undefined" || (attrs__$19.tabindex = tabIndex__$20);
-    ctx__$18.title && (attrs__$19.title = ctx__$18.title);
-    ctx__$18.target && (attrs__$19.target = ctx__$18.target);
-    return attrs__$19;
+    typeof tabIndex__$18 === "undefined" || (attrs__$17.tabindex = tabIndex__$18);
+    ctx__$16.title && (attrs__$17.title = ctx__$16.title);
+    ctx__$16.target && (attrs__$17.target = ctx__$16.target);
+    return attrs__$17;
 }
 
-function __$b71(__$ctx, __$ref) {
-    var attrs__$52 = {
+function __$b72(__$ctx, __$ref) {
+    var attrs__$50 = {
         type: "checkbox",
         autocomplete: "off"
-    }, ctx__$53 = __$ctx.ctx;
-    attrs__$52.name = ctx__$53.name;
-    attrs__$52.value = ctx__$53.val;
-    ctx__$53.checked && (attrs__$52.checked = "checked");
-    ctx__$53.disabled && (attrs__$52.disabled = "disabled");
-    return attrs__$52;
+    }, ctx__$51 = __$ctx.ctx;
+    attrs__$50.name = ctx__$51.name;
+    attrs__$50.value = ctx__$51.val;
+    ctx__$51.checked && (attrs__$50.checked = "checked");
+    ctx__$51.disabled && (attrs__$50.disabled = "disabled");
+    return attrs__$50;
 }
 
-function __$b75(__$ctx, __$ref) {
-    var attrs__$69 = {
+function __$b76(__$ctx, __$ref) {
+    var attrs__$67 = {
         role: "menu"
     };
-    $$mods.disabled || (attrs__$69.tabindex = 0);
-    return attrs__$69;
+    $$mods.disabled || (attrs__$67.tabindex = 0);
+    return attrs__$67;
 }
 
-function __$b77(__$ctx, __$ref) {
-    var ctx__$157 = __$ctx.ctx;
-    return __$ctx.extend(function __$lb__$158() {
-        var __$r__$159;
-        var __$l0__$160 = __$ctx.__$a0;
+function __$b78(__$ctx, __$ref) {
+    var ctx__$155 = __$ctx.ctx;
+    return __$ctx.extend(function __$lb__$156() {
+        var __$r__$157;
+        var __$l0__$158 = __$ctx.__$a0;
         __$ctx.__$a0 = __$ctx.__$a0 | 1048576;
-        __$r__$159 = applyc(__$ctx, __$ref);
-        __$ctx.__$a0 = __$l0__$160;
-        return __$r__$159;
+        __$r__$157 = applyc(__$ctx, __$ref);
+        __$ctx.__$a0 = __$l0__$158;
+        return __$r__$157;
     }(), {
-        src: ctx__$157.url,
-        width: ctx__$157.width,
-        height: ctx__$157.height,
-        alt: ctx__$157.alt,
-        title: ctx__$157.title
+        src: ctx__$155.url,
+        width: ctx__$155.width,
+        height: ctx__$155.height,
+        alt: ctx__$155.alt,
+        title: ctx__$155.title
     });
 }
 
-function __$b79(__$ctx, __$ref) {
+function __$b80(__$ctx, __$ref) {
     if (__$ctx.ctx.color) {
-        var c__$161 = "color:" + __$ctx.ctx.color;
+        var c__$159 = "color:" + __$ctx.ctx.color;
         return {
-            style: c__$161
+            style: c__$159
         };
     }
     return;
 }
 
-function __$b80(__$ctx, __$ref) {
-    var attrs__$175 = {
+function __$b81(__$ctx, __$ref) {
+    var attrs__$173 = {
         "aria-hidden": "true"
-    }, url__$176 = __$ctx.ctx.url;
-    if (url__$176) attrs__$175.style = "background-image:url(" + url__$176 + ")";
-    return attrs__$175;
+    }, url__$174 = __$ctx.ctx.url;
+    if (url__$174) attrs__$173.style = "background-image:url(" + url__$174 + ")";
+    return attrs__$173;
 }
 
-function __$b122(__$ctx, __$ref) {
-    var __$r__$144;
-    var __$l0__$145 = __$ctx._input;
+function __$b124(__$ctx, __$ref) {
+    var __$r__$142;
+    var __$l0__$143 = __$ctx._input;
     __$ctx._input = __$ctx.ctx;
-    var __$r__$147;
-    var __$l1__$148 = __$ctx.__$a0;
+    var __$r__$145;
+    var __$l1__$146 = __$ctx.__$a0;
     __$ctx.__$a0 = __$ctx.__$a0 | 262144;
-    __$r__$147 = applyc(__$ctx, __$ref);
-    __$ctx.__$a0 = __$l1__$148;
-    __$r__$144 = __$r__$147;
-    __$ctx._input = __$l0__$145;
+    __$r__$145 = applyc(__$ctx, __$ref);
+    __$ctx.__$a0 = __$l1__$146;
+    __$r__$142 = __$r__$145;
+    __$ctx._input = __$l0__$143;
     return;
 }
 
-function __$b123(__$ctx, __$ref) {
-    var mods__$106 = $$mods;
-    var __$r__$108;
-    var __$l0__$109 = $$mode;
+function __$b125(__$ctx, __$ref) {
+    var mods__$104 = $$mods;
+    var __$r__$106;
+    var __$l0__$107 = $$mode;
     $$mode = "";
-    var __$l1__$110 = __$ctx.ctx;
+    var __$l1__$108 = __$ctx.ctx;
     __$ctx.ctx = {
         block: "button",
         mix: {
@@ -13907,22 +13914,22 @@ function __$b123(__$ctx, __$ref) {
             elem: $$elem
         },
         mods: {
-            size: mods__$106.size,
-            theme: mods__$106.theme,
-            view: mods__$106.view,
-            focused: mods__$106.focused,
-            disabled: mods__$106.disabled,
-            checked: mods__$106.mode !== "radio" && !!__$ctx._checkedOptions.length
+            size: mods__$104.size,
+            theme: mods__$104.theme,
+            view: mods__$104.view,
+            focused: mods__$104.focused,
+            disabled: mods__$104.disabled,
+            checked: mods__$104.mode !== "radio" && !!__$ctx._checkedOptions.length
         },
         id: __$ctx._select.id,
         tabIndex: __$ctx._select.tabIndex,
-        content: [ function __$lb__$111() {
-            var __$r__$112;
-            var __$l3__$113 = $$mode;
+        content: [ function __$lb__$109() {
+            var __$r__$110;
+            var __$l3__$111 = $$mode;
             $$mode = "content";
-            __$r__$112 = applyc(__$ctx, __$ref);
-            $$mode = __$l3__$113;
-            return __$r__$112;
+            __$r__$110 = applyc(__$ctx, __$ref);
+            $$mode = __$l3__$111;
+            return __$r__$110;
         }(), {
             block: "icon",
             mix: {
@@ -13931,23 +13938,23 @@ function __$b123(__$ctx, __$ref) {
             }
         } ]
     };
-    var __$r__$114;
-    var __$l2__$115 = __$ctx.__$a0;
+    var __$r__$112;
+    var __$l2__$113 = __$ctx.__$a0;
     __$ctx.__$a0 = __$ctx.__$a0 | 32768;
-    __$r__$114 = applyc(__$ctx, __$ref);
-    __$ctx.__$a0 = __$l2__$115;
-    __$r__$108 = __$r__$114;
-    $$mode = __$l0__$109;
-    __$ctx.ctx = __$l1__$110;
+    __$r__$112 = applyc(__$ctx, __$ref);
+    __$ctx.__$a0 = __$l2__$113;
+    __$r__$106 = __$r__$112;
+    $$mode = __$l0__$107;
+    __$ctx.ctx = __$l1__$108;
     return;
 }
 
-function __$b124(__$ctx, __$ref) {
-    var mods__$85 = $$mods, optionToMenuItem__$86 = function(option) {
-        var res__$87 = {
+function __$b126(__$ctx, __$ref) {
+    var mods__$83 = $$mods, optionToMenuItem__$84 = function(option) {
+        var res__$85 = {
             block: "menu-item",
             mods: {
-                disabled: mods__$85.disabled || option.disabled
+                disabled: mods__$83.disabled || option.disabled
             },
             val: option.val,
             js: {
@@ -13956,15 +13963,15 @@ function __$b124(__$ctx, __$ref) {
             content: option.text
         };
         if (option.icon) {
-            res__$87.js.text = option.text;
-            res__$87.content = [ option.icon, res__$87.content ];
+            res__$85.js.text = option.text;
+            res__$85.content = [ option.icon, res__$85.content ];
         }
-        return res__$87;
+        return res__$85;
     };
-    var __$r__$89;
-    var __$l0__$90 = $$mode;
+    var __$r__$87;
+    var __$l0__$88 = $$mode;
     $$mode = "";
-    var __$l1__$91 = __$ctx.ctx;
+    var __$l1__$89 = __$ctx.ctx;
     __$ctx.ctx = {
         block: "menu",
         mix: {
@@ -13972,10 +13979,10 @@ function __$b124(__$ctx, __$ref) {
             elem: $$elem
         },
         mods: {
-            size: mods__$85.size,
-            theme: mods__$85.theme,
-            disabled: mods__$85.disabled,
-            mode: mods__$85.mode
+            size: mods__$83.size,
+            theme: mods__$83.theme,
+            disabled: mods__$83.disabled,
+            mode: mods__$83.mode
         },
         val: __$ctx._select.val,
         attrs: {
@@ -13988,247 +13995,247 @@ function __$b124(__$ctx, __$ref) {
                     "has-title": !!optionOrGroup.title
                 },
                 title: optionOrGroup.title,
-                content: optionOrGroup.group.map(optionToMenuItem__$86)
-            } : optionToMenuItem__$86(optionOrGroup);
+                content: optionOrGroup.group.map(optionToMenuItem__$84)
+            } : optionToMenuItem__$84(optionOrGroup);
         })
     };
-    var __$r__$93;
-    var __$l2__$94 = __$ctx.__$a0;
+    var __$r__$91;
+    var __$l2__$92 = __$ctx.__$a0;
     __$ctx.__$a0 = __$ctx.__$a0 | 4096;
-    __$r__$93 = applyc(__$ctx, __$ref);
-    __$ctx.__$a0 = __$l2__$94;
-    __$r__$89 = __$r__$93;
-    $$mode = __$l0__$90;
-    __$ctx.ctx = __$l1__$91;
-    return;
-}
-
-function __$b125(__$ctx, __$ref) {
-    if (!$$mods.mode) throw Error("Can't build select without mode modifier");
-    var ctx__$120 = __$ctx.ctx, isValDef__$121 = typeof ctx__$120.val !== "undefined", isModeCheck__$122 = $$mods.mode === "check", firstOption__$123, checkedOptions__$124 = [], containsVal__$125 = function(val) {
-        return isValDef__$121 && (isModeCheck__$122 ? ctx__$120.val.indexOf(val) > -1 : ctx__$120.val === val);
-    }, iterateOptions__$126 = function(content) {
-        var i__$127 = 0, option__$128;
-        while (option__$128 = content[i__$127++]) {
-            if (option__$128.group) {
-                iterateOptions__$126(option__$128.group);
-            } else {
-                firstOption__$123 || (firstOption__$123 = option__$128);
-                if (containsVal__$125(option__$128.val)) {
-                    option__$128.checked = true;
-                    checkedOptions__$124.push(option__$128);
-                }
-            }
-        }
-    };
-    iterateOptions__$126(ctx__$120.options);
-    var __$r__$130;
-    var __$l0__$131 = __$ctx._select;
-    __$ctx._select = __$ctx.ctx;
-    var __$l1__$132 = __$ctx._checkedOptions;
-    __$ctx._checkedOptions = checkedOptions__$124;
-    var __$l2__$133 = __$ctx._firstOption;
-    __$ctx._firstOption = firstOption__$123;
-    var __$r__$135;
-    var __$l3__$136 = __$ctx.__$a0;
-    __$ctx.__$a0 = __$ctx.__$a0 | 131072;
-    __$r__$135 = applyc(__$ctx, __$ref);
-    __$ctx.__$a0 = __$l3__$136;
-    __$r__$130 = __$r__$135;
-    __$ctx._select = __$l0__$131;
-    __$ctx._checkedOptions = __$l1__$132;
-    __$ctx._firstOption = __$l2__$133;
-    return;
-}
-
-function __$b126(__$ctx, __$ref) {
-    var ctx__$21 = __$ctx.ctx;
-    typeof ctx__$21.url === "object" && (ctx__$21.url = __$ctx.reapply(ctx__$21.url));
-    var __$r__$23;
-    var __$l0__$24 = __$ctx.__$a0;
-    __$ctx.__$a0 = __$ctx.__$a0 | 32;
-    __$r__$23 = applyc(__$ctx, __$ref);
-    __$ctx.__$a0 = __$l0__$24;
+    __$r__$91 = applyc(__$ctx, __$ref);
+    __$ctx.__$a0 = __$l2__$92;
+    __$r__$87 = __$r__$91;
+    $$mode = __$l0__$88;
+    __$ctx.ctx = __$l1__$89;
     return;
 }
 
 function __$b127(__$ctx, __$ref) {
-    var __$r__$45;
-    var __$l0__$46 = __$ctx._ctx;
-    __$ctx._ctx = __$ctx.ctx;
-    var __$r__$48;
-    var __$l1__$49 = __$ctx.__$a0;
-    __$ctx.__$a0 = __$ctx.__$a0 | 64;
-    __$r__$48 = applyc(__$ctx, __$ref);
-    __$ctx.__$a0 = __$l1__$49;
-    __$r__$45 = __$r__$48;
-    __$ctx._ctx = __$l0__$46;
+    if (!$$mods.mode) throw Error("Can't build select without mode modifier");
+    var ctx__$118 = __$ctx.ctx, isValDef__$119 = typeof ctx__$118.val !== "undefined", isModeCheck__$120 = $$mods.mode === "check", firstOption__$121, checkedOptions__$122 = [], containsVal__$123 = function(val) {
+        return isValDef__$119 && (isModeCheck__$120 ? ctx__$118.val.indexOf(val) > -1 : ctx__$118.val === val);
+    }, iterateOptions__$124 = function(content) {
+        var i__$125 = 0, option__$126;
+        while (option__$126 = content[i__$125++]) {
+            if (option__$126.group) {
+                iterateOptions__$124(option__$126.group);
+            } else {
+                firstOption__$121 || (firstOption__$121 = option__$126);
+                if (containsVal__$123(option__$126.val)) {
+                    option__$126.checked = true;
+                    checkedOptions__$122.push(option__$126);
+                }
+            }
+        }
+    };
+    iterateOptions__$124(ctx__$118.options);
+    var __$r__$128;
+    var __$l0__$129 = __$ctx._select;
+    __$ctx._select = __$ctx.ctx;
+    var __$l1__$130 = __$ctx._checkedOptions;
+    __$ctx._checkedOptions = checkedOptions__$122;
+    var __$l2__$131 = __$ctx._firstOption;
+    __$ctx._firstOption = firstOption__$121;
+    var __$r__$133;
+    var __$l3__$134 = __$ctx.__$a0;
+    __$ctx.__$a0 = __$ctx.__$a0 | 131072;
+    __$r__$133 = applyc(__$ctx, __$ref);
+    __$ctx.__$a0 = __$l3__$134;
+    __$r__$128 = __$r__$133;
+    __$ctx._select = __$l0__$129;
+    __$ctx._checkedOptions = __$l1__$130;
+    __$ctx._firstOption = __$l2__$131;
     return;
 }
 
 function __$b128(__$ctx, __$ref) {
-    var ctx__$70 = __$ctx.ctx, mods__$71 = $$mods, firstItem__$72, checkedItems__$73 = [];
-    if (ctx__$70.content) {
-        var isValDef__$74 = typeof ctx__$70.val !== "undefined", containsVal__$75 = function(val) {
-            return isValDef__$74 && (mods__$71.mode === "check" ? ctx__$70.val.indexOf(val) > -1 : ctx__$70.val === val);
-        }, iterateItems__$76 = function(content) {
-            var i__$77 = 0, itemOrGroup__$78;
-            while (itemOrGroup__$78 = content[i__$77++]) {
-                if (itemOrGroup__$78.block === "menu-item") {
-                    firstItem__$72 || (firstItem__$72 = itemOrGroup__$78);
-                    if (containsVal__$75(itemOrGroup__$78.val)) {
-                        (itemOrGroup__$78.mods = itemOrGroup__$78.mods || {}).checked = true;
-                        checkedItems__$73.push(itemOrGroup__$78);
-                    }
-                } else {
-                    iterateItems__$76(itemOrGroup__$78.content);
-                }
-            }
-        };
-        if (!__$ctx.isArray(ctx__$70.content)) throw Error("menu: content must be an array of the menu items");
-        iterateItems__$76(ctx__$70.content);
-    }
-    __$ctx._firstItem = firstItem__$72;
-    __$ctx._checkedItems = checkedItems__$73;
-    var __$r__$80;
-    var __$l0__$81 = __$ctx._menuMods;
-    __$ctx._menuMods = {
-        theme: mods__$71.theme,
-        disabled: mods__$71.disabled
-    };
-    var __$r__$83;
-    var __$l1__$84 = __$ctx.__$a0;
-    __$ctx.__$a0 = __$ctx.__$a0 | 2048;
-    __$r__$83 = applyc(__$ctx, __$ref);
-    __$ctx.__$a0 = __$l1__$84;
-    __$r__$80 = __$r__$83;
-    __$ctx._menuMods = __$l0__$81;
+    var ctx__$19 = __$ctx.ctx;
+    typeof ctx__$19.url === "object" && (ctx__$19.url = __$ctx.reapply(ctx__$19.url));
+    var __$r__$21;
+    var __$l0__$22 = __$ctx.__$a0;
+    __$ctx.__$a0 = __$ctx.__$a0 | 32;
+    __$r__$21 = applyc(__$ctx, __$ref);
+    __$ctx.__$a0 = __$l0__$22;
     return;
 }
 
 function __$b129(__$ctx, __$ref) {
-    var mods__$65 = $$mods;
-    mods__$65.theme = mods__$65.theme || __$ctx._menuMods.theme;
-    mods__$65.disabled = mods__$65.disabled || __$ctx._menuMods.disabled;
-    var __$r__$67;
-    var __$l0__$68 = __$ctx.__$a0;
-    __$ctx.__$a0 = __$ctx.__$a0 | 1024;
-    __$r__$67 = applyc(__$ctx, __$ref);
-    __$ctx.__$a0 = __$l0__$68;
+    var __$r__$43;
+    var __$l0__$44 = __$ctx._ctx;
+    __$ctx._ctx = __$ctx.ctx;
+    var __$r__$46;
+    var __$l1__$47 = __$ctx.__$a0;
+    __$ctx.__$a0 = __$ctx.__$a0 | 64;
+    __$r__$46 = applyc(__$ctx, __$ref);
+    __$ctx.__$a0 = __$l1__$47;
+    __$r__$43 = __$r__$46;
+    __$ctx._ctx = __$l0__$44;
     return;
 }
 
 function __$b130(__$ctx, __$ref) {
-    var ctx__$149 = __$ctx.ctx;
-    ctx__$149._wrapped = true;
-    ctx__$149.mods = __$ctx.extend({
-        position: "right",
-        visible: "no"
-    }, ctx__$149.mods);
-    var __$r__$151;
-    var __$l0__$152 = $$mode;
-    $$mode = "";
-    var __$l1__$153 = __$ctx.ctx;
-    __$ctx.ctx = ctx__$149;
-    var __$r__$155;
-    var __$l2__$156 = __$ctx.__$a0;
-    __$ctx.__$a0 = __$ctx.__$a0 | 524288;
-    __$r__$155 = applyc(__$ctx, __$ref);
-    __$ctx.__$a0 = __$l2__$156;
-    __$r__$151 = __$r__$155;
-    $$mode = __$l0__$152;
-    __$ctx.ctx = __$l1__$153;
+    var ctx__$68 = __$ctx.ctx, mods__$69 = $$mods, firstItem__$70, checkedItems__$71 = [];
+    if (ctx__$68.content) {
+        var isValDef__$72 = typeof ctx__$68.val !== "undefined", containsVal__$73 = function(val) {
+            return isValDef__$72 && (mods__$69.mode === "check" ? ctx__$68.val.indexOf(val) > -1 : ctx__$68.val === val);
+        }, iterateItems__$74 = function(content) {
+            var i__$75 = 0, itemOrGroup__$76;
+            while (itemOrGroup__$76 = content[i__$75++]) {
+                if (itemOrGroup__$76.block === "menu-item") {
+                    firstItem__$70 || (firstItem__$70 = itemOrGroup__$76);
+                    if (containsVal__$73(itemOrGroup__$76.val)) {
+                        (itemOrGroup__$76.mods = itemOrGroup__$76.mods || {}).checked = true;
+                        checkedItems__$71.push(itemOrGroup__$76);
+                    }
+                } else {
+                    iterateItems__$74(itemOrGroup__$76.content);
+                }
+            }
+        };
+        if (!__$ctx.isArray(ctx__$68.content)) throw Error("menu: content must be an array of the menu items");
+        iterateItems__$74(ctx__$68.content);
+    }
+    __$ctx._firstItem = firstItem__$70;
+    __$ctx._checkedItems = checkedItems__$71;
+    var __$r__$78;
+    var __$l0__$79 = __$ctx._menuMods;
+    __$ctx._menuMods = {
+        theme: mods__$69.theme,
+        disabled: mods__$69.disabled
+    };
+    var __$r__$81;
+    var __$l1__$82 = __$ctx.__$a0;
+    __$ctx.__$a0 = __$ctx.__$a0 | 2048;
+    __$r__$81 = applyc(__$ctx, __$ref);
+    __$ctx.__$a0 = __$l1__$82;
+    __$r__$78 = __$r__$81;
+    __$ctx._menuMods = __$l0__$79;
     return;
 }
 
 function __$b131(__$ctx, __$ref) {
-    var BEM_INTERNAL__$177 = __$ctx.BEM.INTERNAL, ctx__$178 = __$ctx.ctx, isBEM__$179, tag__$180, res__$181;
-    var __$r__$183;
-    var __$l0__$184 = __$ctx._str;
+    var mods__$63 = $$mods;
+    mods__$63.theme = mods__$63.theme || __$ctx._menuMods.theme;
+    mods__$63.disabled = mods__$63.disabled || __$ctx._menuMods.disabled;
+    var __$r__$65;
+    var __$l0__$66 = __$ctx.__$a0;
+    __$ctx.__$a0 = __$ctx.__$a0 | 1024;
+    __$r__$65 = applyc(__$ctx, __$ref);
+    __$ctx.__$a0 = __$l0__$66;
+    return;
+}
+
+function __$b132(__$ctx, __$ref) {
+    var ctx__$147 = __$ctx.ctx;
+    ctx__$147._wrapped = true;
+    ctx__$147.mods = __$ctx.extend({
+        position: "right",
+        visible: "no"
+    }, ctx__$147.mods);
+    var __$r__$149;
+    var __$l0__$150 = $$mode;
+    $$mode = "";
+    var __$l1__$151 = __$ctx.ctx;
+    __$ctx.ctx = ctx__$147;
+    var __$r__$153;
+    var __$l2__$154 = __$ctx.__$a0;
+    __$ctx.__$a0 = __$ctx.__$a0 | 524288;
+    __$r__$153 = applyc(__$ctx, __$ref);
+    __$ctx.__$a0 = __$l2__$154;
+    __$r__$149 = __$r__$153;
+    $$mode = __$l0__$150;
+    __$ctx.ctx = __$l1__$151;
+    return;
+}
+
+function __$b133(__$ctx, __$ref) {
+    var BEM_INTERNAL__$175 = __$ctx.BEM.INTERNAL, ctx__$176 = __$ctx.ctx, isBEM__$177, tag__$178, res__$179;
+    var __$r__$181;
+    var __$l0__$182 = __$ctx._str;
     __$ctx._str = "";
-    var vBlock__$185 = $$block;
-    var __$r__$187;
-    var __$l1__$188 = $$mode;
+    var vBlock__$183 = $$block;
+    var __$r__$185;
+    var __$l1__$186 = $$mode;
     $$mode = "tag";
-    __$r__$187 = applyc(__$ctx, __$ref);
-    $$mode = __$l1__$188;
-    tag__$180 = __$r__$187;
-    typeof tag__$180 !== "undefined" || (tag__$180 = ctx__$178.tag);
-    typeof tag__$180 !== "undefined" || (tag__$180 = "div");
-    if (tag__$180) {
-        var jsParams__$189, js__$190;
-        if (vBlock__$185 && ctx__$178.js !== false) {
-            var __$r__$191;
-            var __$l2__$192 = $$mode;
+    __$r__$185 = applyc(__$ctx, __$ref);
+    $$mode = __$l1__$186;
+    tag__$178 = __$r__$185;
+    typeof tag__$178 !== "undefined" || (tag__$178 = ctx__$176.tag);
+    typeof tag__$178 !== "undefined" || (tag__$178 = "div");
+    if (tag__$178) {
+        var jsParams__$187, js__$188;
+        if (vBlock__$183 && ctx__$176.js !== false) {
+            var __$r__$189;
+            var __$l2__$190 = $$mode;
             $$mode = "js";
-            __$r__$191 = applyc(__$ctx, __$ref);
-            $$mode = __$l2__$192;
-            js__$190 = __$r__$191;
-            js__$190 = js__$190 ? __$ctx.extend(ctx__$178.js, js__$190 === true ? {} : js__$190) : ctx__$178.js === true ? {} : ctx__$178.js;
-            js__$190 && ((jsParams__$189 = {})[BEM_INTERNAL__$177.buildClass(vBlock__$185, ctx__$178.elem)] = js__$190);
+            __$r__$189 = applyc(__$ctx, __$ref);
+            $$mode = __$l2__$190;
+            js__$188 = __$r__$189;
+            js__$188 = js__$188 ? __$ctx.extend(ctx__$176.js, js__$188 === true ? {} : js__$188) : ctx__$176.js === true ? {} : ctx__$176.js;
+            js__$188 && ((jsParams__$187 = {})[BEM_INTERNAL__$175.buildClass(vBlock__$183, ctx__$176.elem)] = js__$188);
         }
-        __$ctx._str += "<" + tag__$180;
-        var __$r__$193;
-        var __$l3__$194 = $$mode;
+        __$ctx._str += "<" + tag__$178;
+        var __$r__$191;
+        var __$l3__$192 = $$mode;
         $$mode = "bem";
-        __$r__$193 = applyc(__$ctx, __$ref);
-        $$mode = __$l3__$194;
-        isBEM__$179 = __$r__$193;
-        typeof isBEM__$179 !== "undefined" || (isBEM__$179 = typeof ctx__$178.bem !== "undefined" ? ctx__$178.bem : ctx__$178.block || ctx__$178.elem);
-        var __$r__$196;
-        var __$l4__$197 = $$mode;
+        __$r__$191 = applyc(__$ctx, __$ref);
+        $$mode = __$l3__$192;
+        isBEM__$177 = __$r__$191;
+        typeof isBEM__$177 !== "undefined" || (isBEM__$177 = typeof ctx__$176.bem !== "undefined" ? ctx__$176.bem : ctx__$176.block || ctx__$176.elem);
+        var __$r__$194;
+        var __$l4__$195 = $$mode;
         $$mode = "cls";
-        __$r__$196 = applyc(__$ctx, __$ref);
-        $$mode = __$l4__$197;
-        var cls__$195 = __$r__$196;
-        cls__$195 || (cls__$195 = ctx__$178.cls);
-        var addJSInitClass__$198 = ctx__$178.block && jsParams__$189 && !ctx__$178.elem;
-        if (isBEM__$179 || cls__$195) {
+        __$r__$194 = applyc(__$ctx, __$ref);
+        $$mode = __$l4__$195;
+        var cls__$193 = __$r__$194;
+        cls__$193 || (cls__$193 = ctx__$176.cls);
+        var addJSInitClass__$196 = ctx__$176.block && jsParams__$187 && !ctx__$176.elem;
+        if (isBEM__$177 || cls__$193) {
             __$ctx._str += ' class="';
-            if (isBEM__$179) {
-                __$ctx._str += BEM_INTERNAL__$177.buildClasses(vBlock__$185, ctx__$178.elem, ctx__$178.elemMods || ctx__$178.mods);
-                var __$r__$200;
-                var __$l5__$201 = $$mode;
+            if (isBEM__$177) {
+                __$ctx._str += BEM_INTERNAL__$175.buildClasses(vBlock__$183, ctx__$176.elem, ctx__$176.elemMods || ctx__$176.mods);
+                var __$r__$198;
+                var __$l5__$199 = $$mode;
                 $$mode = "mix";
-                __$r__$200 = applyc(__$ctx, __$ref);
-                $$mode = __$l5__$201;
-                var mix__$199 = __$r__$200;
-                ctx__$178.mix && (mix__$199 = mix__$199 ? [].concat(mix__$199, ctx__$178.mix) : ctx__$178.mix);
-                if (mix__$199) {
-                    var visited__$202 = {}, visitedKey__$203 = function(block, elem) {
+                __$r__$198 = applyc(__$ctx, __$ref);
+                $$mode = __$l5__$199;
+                var mix__$197 = __$r__$198;
+                ctx__$176.mix && (mix__$197 = mix__$197 ? [].concat(mix__$197, ctx__$176.mix) : ctx__$176.mix);
+                if (mix__$197) {
+                    var visited__$200 = {}, visitedKey__$201 = function(block, elem) {
                         return (block || "") + "__" + (elem || "");
                     };
-                    visited__$202[visitedKey__$203(vBlock__$185, $$elem)] = true;
-                    __$ctx.isArray(mix__$199) || (mix__$199 = [ mix__$199 ]);
-                    for (var i__$204 = 0; i__$204 < mix__$199.length; i__$204++) {
-                        var mixItem__$205 = mix__$199[i__$204], hasItem__$206 = mixItem__$205.block && (vBlock__$185 !== ctx__$178.block || mixItem__$205.block !== vBlock__$185) || mixItem__$205.elem, mixBlock__$207 = mixItem__$205.block || mixItem__$205._block || $$block, mixElem__$208 = mixItem__$205.elem || mixItem__$205._elem || $$elem;
-                        hasItem__$206 && (__$ctx._str += " ");
-                        __$ctx._str += BEM_INTERNAL__$177[hasItem__$206 ? "buildClasses" : "buildModsClasses"](mixBlock__$207, mixItem__$205.elem || mixItem__$205._elem || (mixItem__$205.block ? undefined : $$elem), mixItem__$205.elemMods || mixItem__$205.mods);
-                        if (mixItem__$205.js) {
-                            (jsParams__$189 || (jsParams__$189 = {}))[BEM_INTERNAL__$177.buildClass(mixBlock__$207, mixItem__$205.elem)] = mixItem__$205.js === true ? {} : mixItem__$205.js;
-                            addJSInitClass__$198 || (addJSInitClass__$198 = mixBlock__$207 && !mixItem__$205.elem);
+                    visited__$200[visitedKey__$201(vBlock__$183, $$elem)] = true;
+                    __$ctx.isArray(mix__$197) || (mix__$197 = [ mix__$197 ]);
+                    for (var i__$202 = 0; i__$202 < mix__$197.length; i__$202++) {
+                        var mixItem__$203 = mix__$197[i__$202], hasItem__$204 = mixItem__$203.block && (vBlock__$183 !== ctx__$176.block || mixItem__$203.block !== vBlock__$183) || mixItem__$203.elem, mixBlock__$205 = mixItem__$203.block || mixItem__$203._block || $$block, mixElem__$206 = mixItem__$203.elem || mixItem__$203._elem || $$elem;
+                        hasItem__$204 && (__$ctx._str += " ");
+                        __$ctx._str += BEM_INTERNAL__$175[hasItem__$204 ? "buildClasses" : "buildModsClasses"](mixBlock__$205, mixItem__$203.elem || mixItem__$203._elem || (mixItem__$203.block ? undefined : $$elem), mixItem__$203.elemMods || mixItem__$203.mods);
+                        if (mixItem__$203.js) {
+                            (jsParams__$187 || (jsParams__$187 = {}))[BEM_INTERNAL__$175.buildClass(mixBlock__$205, mixItem__$203.elem)] = mixItem__$203.js === true ? {} : mixItem__$203.js;
+                            addJSInitClass__$196 || (addJSInitClass__$196 = mixBlock__$205 && !mixItem__$203.elem);
                         }
-                        if (hasItem__$206 && !visited__$202[visitedKey__$203(mixBlock__$207, mixElem__$208)]) {
-                            visited__$202[visitedKey__$203(mixBlock__$207, mixElem__$208)] = true;
-                            var __$r__$210;
-                            var __$l6__$211 = $$mode;
+                        if (hasItem__$204 && !visited__$200[visitedKey__$201(mixBlock__$205, mixElem__$206)]) {
+                            visited__$200[visitedKey__$201(mixBlock__$205, mixElem__$206)] = true;
+                            var __$r__$208;
+                            var __$l6__$209 = $$mode;
                             $$mode = "mix";
-                            var __$l7__$212 = $$block;
-                            $$block = mixBlock__$207;
-                            var __$l8__$213 = $$elem;
-                            $$elem = mixElem__$208;
-                            __$r__$210 = applyc(__$ctx, __$ref);
-                            $$mode = __$l6__$211;
-                            $$block = __$l7__$212;
-                            $$elem = __$l8__$213;
-                            var nestedMix__$209 = __$r__$210;
-                            if (nestedMix__$209) {
-                                for (var j__$214 = 0; j__$214 < nestedMix__$209.length; j__$214++) {
-                                    var nestedItem__$215 = nestedMix__$209[j__$214];
-                                    if (!nestedItem__$215.block && !nestedItem__$215.elem || !visited__$202[visitedKey__$203(nestedItem__$215.block, nestedItem__$215.elem)]) {
-                                        nestedItem__$215._block = mixBlock__$207;
-                                        nestedItem__$215._elem = mixElem__$208;
-                                        mix__$199.splice(i__$204 + 1, 0, nestedItem__$215);
+                            var __$l7__$210 = $$block;
+                            $$block = mixBlock__$205;
+                            var __$l8__$211 = $$elem;
+                            $$elem = mixElem__$206;
+                            __$r__$208 = applyc(__$ctx, __$ref);
+                            $$mode = __$l6__$209;
+                            $$block = __$l7__$210;
+                            $$elem = __$l8__$211;
+                            var nestedMix__$207 = __$r__$208;
+                            if (nestedMix__$207) {
+                                for (var j__$212 = 0; j__$212 < nestedMix__$207.length; j__$212++) {
+                                    var nestedItem__$213 = nestedMix__$207[j__$212];
+                                    if (!nestedItem__$213.block && !nestedItem__$213.elem || !visited__$200[visitedKey__$201(nestedItem__$213.block, nestedItem__$213.elem)]) {
+                                        nestedItem__$213._block = mixBlock__$205;
+                                        nestedItem__$213._elem = mixElem__$206;
+                                        mix__$197.splice(i__$202 + 1, 0, nestedItem__$213);
                                     }
                                 }
                             }
@@ -14236,181 +14243,181 @@ function __$b131(__$ctx, __$ref) {
                     }
                 }
             }
-            cls__$195 && (__$ctx._str += isBEM__$179 ? " " + cls__$195 : cls__$195);
-            __$ctx._str += addJSInitClass__$198 ? ' i-bem"' : '"';
+            cls__$193 && (__$ctx._str += isBEM__$177 ? " " + cls__$193 : cls__$193);
+            __$ctx._str += addJSInitClass__$196 ? ' i-bem"' : '"';
         }
-        if (isBEM__$179 && jsParams__$189) {
-            __$ctx._str += ' data-bem="' + __$ctx.attrEscape(JSON.stringify(jsParams__$189)) + '"';
+        if (isBEM__$177 && jsParams__$187) {
+            __$ctx._str += ' data-bem="' + __$ctx.attrEscape(JSON.stringify(jsParams__$187)) + '"';
         }
-        var __$r__$217;
-        var __$l9__$218 = $$mode;
+        var __$r__$215;
+        var __$l9__$216 = $$mode;
         $$mode = "attrs";
-        __$r__$217 = applyc(__$ctx, __$ref);
-        $$mode = __$l9__$218;
-        var attrs__$216 = __$r__$217;
-        attrs__$216 = __$ctx.extend(attrs__$216, ctx__$178.attrs);
-        if (attrs__$216) {
-            var name__$219, attr__$220;
-            for (name__$219 in attrs__$216) {
-                attr__$220 = attrs__$216[name__$219];
-                if (typeof attr__$220 === "undefined") continue;
-                __$ctx._str += " " + name__$219 + '="' + __$ctx.attrEscape(__$ctx.isSimple(attr__$220) ? attr__$220 : __$ctx.reapply(attr__$220)) + '"';
+        __$r__$215 = applyc(__$ctx, __$ref);
+        $$mode = __$l9__$216;
+        var attrs__$214 = __$r__$215;
+        attrs__$214 = __$ctx.extend(attrs__$214, ctx__$176.attrs);
+        if (attrs__$214) {
+            var name__$217, attr__$218;
+            for (name__$217 in attrs__$214) {
+                attr__$218 = attrs__$214[name__$217];
+                if (typeof attr__$218 === "undefined") continue;
+                __$ctx._str += " " + name__$217 + '="' + __$ctx.attrEscape(__$ctx.isSimple(attr__$218) ? attr__$218 : __$ctx.reapply(attr__$218)) + '"';
             }
         }
     }
-    if (__$ctx.isShortTag(tag__$180)) {
+    if (__$ctx.isShortTag(tag__$178)) {
         __$ctx._str += "/>";
     } else {
-        tag__$180 && (__$ctx._str += ">");
-        var __$r__$222;
-        var __$l10__$223 = $$mode;
+        tag__$178 && (__$ctx._str += ">");
+        var __$r__$220;
+        var __$l10__$221 = $$mode;
         $$mode = "content";
-        __$r__$222 = applyc(__$ctx, __$ref);
-        $$mode = __$l10__$223;
-        var content__$221 = __$r__$222;
-        if (content__$221 || content__$221 === 0) {
-            isBEM__$179 = vBlock__$185 || $$elem;
-            var __$r__$224;
-            var __$l11__$225 = $$mode;
+        __$r__$220 = applyc(__$ctx, __$ref);
+        $$mode = __$l10__$221;
+        var content__$219 = __$r__$220;
+        if (content__$219 || content__$219 === 0) {
+            isBEM__$177 = vBlock__$183 || $$elem;
+            var __$r__$222;
+            var __$l11__$223 = $$mode;
             $$mode = "";
-            var __$l12__$226 = __$ctx._notNewList;
+            var __$l12__$224 = __$ctx._notNewList;
             __$ctx._notNewList = false;
-            var __$l13__$227 = __$ctx.position;
-            __$ctx.position = isBEM__$179 ? 1 : __$ctx.position;
-            var __$l14__$228 = __$ctx._listLength;
-            __$ctx._listLength = isBEM__$179 ? 1 : __$ctx._listLength;
-            var __$l15__$229 = __$ctx.ctx;
-            __$ctx.ctx = content__$221;
-            __$r__$224 = applyc(__$ctx, __$ref);
-            $$mode = __$l11__$225;
-            __$ctx._notNewList = __$l12__$226;
-            __$ctx.position = __$l13__$227;
-            __$ctx._listLength = __$l14__$228;
-            __$ctx.ctx = __$l15__$229;
+            var __$l13__$225 = __$ctx.position;
+            __$ctx.position = isBEM__$177 ? 1 : __$ctx.position;
+            var __$l14__$226 = __$ctx._listLength;
+            __$ctx._listLength = isBEM__$177 ? 1 : __$ctx._listLength;
+            var __$l15__$227 = __$ctx.ctx;
+            __$ctx.ctx = content__$219;
+            __$r__$222 = applyc(__$ctx, __$ref);
+            $$mode = __$l11__$223;
+            __$ctx._notNewList = __$l12__$224;
+            __$ctx.position = __$l13__$225;
+            __$ctx._listLength = __$l14__$226;
+            __$ctx.ctx = __$l15__$227;
         }
-        tag__$180 && (__$ctx._str += "</" + tag__$180 + ">");
+        tag__$178 && (__$ctx._str += "</" + tag__$178 + ">");
     }
-    res__$181 = __$ctx._str;
-    __$r__$183 = undefined;
-    __$ctx._str = __$l0__$184;
-    __$ctx._buf.push(res__$181);
+    res__$179 = __$ctx._str;
+    __$r__$181 = undefined;
+    __$ctx._str = __$l0__$182;
+    __$ctx._buf.push(res__$179);
     return;
-}
-
-function __$b134(__$ctx, __$ref) {
-    var arr__$162 = [], icon__$163 = __$ctx.ctx.icon, size__$164 = __$ctx.ctx.size, width__$165 = __$ctx.ctx.width, list__$166 = __$ctx.ctx.list, rotate__$167 = __$ctx.ctx.rotate, animate__$168 = __$ctx.ctx.animate, flip__$169 = __$ctx.ctx.flip, instack__$170 = __$ctx.ctx.__instack, stack__$171 = __$ctx.ctx.stack, cls__$172 = __$ctx.ctx.cls;
-    if (cls__$172) return cls__$172;
-    if (stack__$171) return "fa-stack fa-" + size__$164;
-    if (icon__$163) arr__$162.push("", icon__$163);
-    if (size__$164) {
-        if (instack__$170) {
-            arr__$162.push("stack-" + size__$164);
-        } else {
-            arr__$162.push(size__$164);
-        }
-    }
-    if (width__$165 === "fixed") arr__$162.push("fw");
-    if (list__$166) arr__$162.push("li");
-    if (rotate__$167) {
-        var angle__$173 = 0;
-        switch (rotate__$167) {
-          case "270" || 270:
-            angle__$173 += 90;
-
-          case "180" || 180:
-            angle__$173 += 90;
-
-          case "90" || 90:
-            angle__$173 += 90;
-
-          default:
-            arr__$162.push("rotate-" + angle__$173);
-        }
-    }
-    if (animate__$168 === "spin" || animate__$168 === "pulse") {
-        arr__$162.push(animate__$168);
-    }
-    if (flip__$169) arr__$162.push("flip-" + flip__$169);
-    return arr__$162.join(" fa-");
 }
 
 function __$b136(__$ctx, __$ref) {
-    var __$r__$231;
-    var __$l0__$232 = $$mode;
-    $$mode = "";
-    var __$l1__$233 = __$ctx.ctx;
-    __$ctx.ctx = __$ctx.ctx._value;
-    var __$r__$235;
-    var __$l2__$236 = __$ctx.__$a0;
-    __$ctx.__$a0 = __$ctx.__$a0 | 2097152;
-    __$r__$235 = applyc(__$ctx, __$ref);
-    __$ctx.__$a0 = __$l2__$236;
-    __$r__$231 = __$r__$235;
-    $$mode = __$l0__$232;
-    __$ctx.ctx = __$l1__$233;
-    return;
-}
-
-function __$b137(__$ctx, __$ref) {
-    __$ctx._listLength--;
-    var ctx__$237 = __$ctx.ctx;
-    if (ctx__$237 && ctx__$237 !== true || ctx__$237 === 0) {
-        __$ctx._str += ctx__$237 + "";
+    var arr__$160 = [], icon__$161 = __$ctx.ctx.icon, size__$162 = __$ctx.ctx.size, width__$163 = __$ctx.ctx.width, list__$164 = __$ctx.ctx.list, rotate__$165 = __$ctx.ctx.rotate, animate__$166 = __$ctx.ctx.animate, flip__$167 = __$ctx.ctx.flip, instack__$168 = __$ctx.ctx.__instack, stack__$169 = __$ctx.ctx.stack, cls__$170 = __$ctx.ctx.cls;
+    if (cls__$170) return cls__$170;
+    if (stack__$169) return "fa-stack fa-" + size__$162;
+    if (icon__$161) arr__$160.push("", icon__$161);
+    if (size__$162) {
+        if (instack__$168) {
+            arr__$160.push("stack-" + size__$162);
+        } else {
+            arr__$160.push(size__$162);
+        }
     }
-    return;
+    if (width__$163 === "fixed") arr__$160.push("fw");
+    if (list__$164) arr__$160.push("li");
+    if (rotate__$165) {
+        var angle__$171 = 0;
+        switch (rotate__$165) {
+          case "270" || 270:
+            angle__$171 += 90;
+
+          case "180" || 180:
+            angle__$171 += 90;
+
+          case "90" || 90:
+            angle__$171 += 90;
+
+          default:
+            arr__$160.push("rotate-" + angle__$171);
+        }
+    }
+    if (animate__$166 === "spin" || animate__$166 === "pulse") {
+        arr__$160.push(animate__$166);
+    }
+    if (flip__$167) arr__$160.push("flip-" + flip__$167);
+    return arr__$160.join(" fa-");
 }
 
 function __$b138(__$ctx, __$ref) {
-    __$ctx._listLength--;
+    var __$r__$229;
+    var __$l0__$230 = $$mode;
+    $$mode = "";
+    var __$l1__$231 = __$ctx.ctx;
+    __$ctx.ctx = __$ctx.ctx._value;
+    var __$r__$233;
+    var __$l2__$234 = __$ctx.__$a0;
+    __$ctx.__$a0 = __$ctx.__$a0 | 2097152;
+    __$r__$233 = applyc(__$ctx, __$ref);
+    __$ctx.__$a0 = __$l2__$234;
+    __$r__$229 = __$r__$233;
+    $$mode = __$l0__$230;
+    __$ctx.ctx = __$l1__$231;
     return;
 }
 
 function __$b139(__$ctx, __$ref) {
-    var ctx__$238 = __$ctx.ctx, len__$239 = ctx__$238.length, i__$240 = 0, prevPos__$241 = __$ctx.position, prevNotNewList__$242 = __$ctx._notNewList;
-    if (prevNotNewList__$242) {
-        __$ctx._listLength += len__$239 - 1;
-    } else {
-        __$ctx.position = 0;
-        __$ctx._listLength = len__$239;
+    __$ctx._listLength--;
+    var ctx__$235 = __$ctx.ctx;
+    if (ctx__$235 && ctx__$235 !== true || ctx__$235 === 0) {
+        __$ctx._str += ctx__$235 + "";
     }
-    __$ctx._notNewList = true;
-    while (i__$240 < len__$239) (function __$lb__$243() {
-        var __$r__$244;
-        var __$l0__$245 = __$ctx.ctx;
-        __$ctx.ctx = ctx__$238[i__$240++];
-        __$r__$244 = applyc(__$ctx, __$ref);
-        __$ctx.ctx = __$l0__$245;
-        return __$r__$244;
-    })();
-    prevNotNewList__$242 || (__$ctx.position = prevPos__$241);
     return;
 }
 
 function __$b140(__$ctx, __$ref) {
+    __$ctx._listLength--;
+    return;
+}
+
+function __$b141(__$ctx, __$ref) {
+    var ctx__$236 = __$ctx.ctx, len__$237 = ctx__$236.length, i__$238 = 0, prevPos__$239 = __$ctx.position, prevNotNewList__$240 = __$ctx._notNewList;
+    if (prevNotNewList__$240) {
+        __$ctx._listLength += len__$237 - 1;
+    } else {
+        __$ctx.position = 0;
+        __$ctx._listLength = len__$237;
+    }
+    __$ctx._notNewList = true;
+    while (i__$238 < len__$237) (function __$lb__$241() {
+        var __$r__$242;
+        var __$l0__$243 = __$ctx.ctx;
+        __$ctx.ctx = ctx__$236[i__$238++];
+        __$r__$242 = applyc(__$ctx, __$ref);
+        __$ctx.ctx = __$l0__$243;
+        return __$r__$242;
+    })();
+    prevNotNewList__$240 || (__$ctx.position = prevPos__$239);
+    return;
+}
+
+function __$b142(__$ctx, __$ref) {
     __$ctx.ctx || (__$ctx.ctx = {});
-    var vBlock__$246 = __$ctx.ctx.block, vElem__$247 = __$ctx.ctx.elem, block__$248 = __$ctx._currBlock || $$block;
-    var __$r__$250;
-    var __$l0__$251 = $$mode;
+    var vBlock__$244 = __$ctx.ctx.block, vElem__$245 = __$ctx.ctx.elem, block__$246 = __$ctx._currBlock || $$block;
+    var __$r__$248;
+    var __$l0__$249 = $$mode;
     $$mode = "default";
-    var __$l1__$252 = $$block;
-    $$block = vBlock__$246 || (vElem__$247 ? block__$248 : undefined);
-    var __$l2__$253 = __$ctx._currBlock;
-    __$ctx._currBlock = vBlock__$246 || vElem__$247 ? undefined : block__$248;
-    var __$l3__$254 = $$elem;
-    $$elem = vElem__$247;
-    var __$l4__$255 = $$mods;
-    $$mods = vBlock__$246 ? __$ctx.ctx.mods || (__$ctx.ctx.mods = {}) : $$mods;
-    var __$l5__$256 = $$elemMods;
+    var __$l1__$250 = $$block;
+    $$block = vBlock__$244 || (vElem__$245 ? block__$246 : undefined);
+    var __$l2__$251 = __$ctx._currBlock;
+    __$ctx._currBlock = vBlock__$244 || vElem__$245 ? undefined : block__$246;
+    var __$l3__$252 = $$elem;
+    $$elem = vElem__$245;
+    var __$l4__$253 = $$mods;
+    $$mods = vBlock__$244 ? __$ctx.ctx.mods || (__$ctx.ctx.mods = {}) : $$mods;
+    var __$l5__$254 = $$elemMods;
     $$elemMods = __$ctx.ctx.elemMods || {};
     $$block || $$elem ? __$ctx.position = (__$ctx.position || 0) + 1 : __$ctx._listLength--;
     applyc(__$ctx, __$ref);
-    __$r__$250 = undefined;
-    $$mode = __$l0__$251;
-    $$block = __$l1__$252;
-    __$ctx._currBlock = __$l2__$253;
-    $$elem = __$l3__$254;
-    $$mods = __$l4__$255;
-    $$elemMods = __$l5__$256;
+    __$r__$248 = undefined;
+    $$mode = __$l0__$249;
+    $$block = __$l1__$250;
+    __$ctx._currBlock = __$l2__$251;
+    $$elem = __$l3__$252;
+    $$mods = __$l4__$253;
+    $$elemMods = __$l5__$254;
     return;
 }
 
@@ -14430,26 +14437,26 @@ function __$g0(__$ctx, __$ref) {
             var __$t = $$mods;
             if (__$t) {
                 if ($$mods["mode"] === "radio-check" && (__$ctx.__$a0 & 8) === 0) {
-                    var __$r = __$ctx.extend(function __$lb__$12() {
-                        var __$r__$13;
-                        var __$l0__$14 = __$ctx.__$a0;
+                    var __$r = __$ctx.extend(function __$lb__$10() {
+                        var __$r__$11;
+                        var __$l0__$12 = __$ctx.__$a0;
                         __$ctx.__$a0 = __$ctx.__$a0 | 8;
-                        __$r__$13 = applyc(__$ctx, __$ref);
-                        __$ctx.__$a0 = __$l0__$14;
-                        return __$r__$13;
+                        __$r__$11 = applyc(__$ctx, __$ref);
+                        __$ctx.__$a0 = __$l0__$12;
+                        return __$r__$11;
                     }(), {
                         text: __$ctx.ctx.text
                     });
                     if (__$r !== __$ref) return __$r;
                 }
                 if ($$mods["focused"] === true && (__$ctx.__$a0 & 65536) === 0) {
-                    var __$r = __$ctx.extend(function __$lb__$116() {
-                        var __$r__$117;
-                        var __$l0__$118 = __$ctx.__$a0;
+                    var __$r = __$ctx.extend(function __$lb__$114() {
+                        var __$r__$115;
+                        var __$l0__$116 = __$ctx.__$a0;
                         __$ctx.__$a0 = __$ctx.__$a0 | 65536;
-                        __$r__$117 = applyc(__$ctx, __$ref);
-                        __$ctx.__$a0 = __$l0__$118;
-                        return __$r__$117;
+                        __$r__$115 = applyc(__$ctx, __$ref);
+                        __$ctx.__$a0 = __$l0__$116;
+                        return __$r__$115;
                     }(), {
                         live: false
                     });
@@ -14463,13 +14470,13 @@ function __$g0(__$ctx, __$ref) {
         var __$t = !$$elem;
         if (__$t) {
             if ($$mods && $$mods["focused"] === true && (__$ctx.__$a0 & 8192) === 0) {
-                var __$r = __$ctx.extend(function __$lb__$95() {
-                    var __$r__$96;
-                    var __$l0__$97 = __$ctx.__$a0;
+                var __$r = __$ctx.extend(function __$lb__$93() {
+                    var __$r__$94;
+                    var __$l0__$95 = __$ctx.__$a0;
                     __$ctx.__$a0 = __$ctx.__$a0 | 8192;
-                    __$r__$96 = applyc(__$ctx, __$ref);
-                    __$ctx.__$a0 = __$l0__$97;
-                    return __$r__$96;
+                    __$r__$94 = applyc(__$ctx, __$ref);
+                    __$ctx.__$a0 = __$l0__$95;
+                    return __$r__$94;
                 }(), {
                     live: false
                 });
@@ -14481,13 +14488,13 @@ function __$g0(__$ctx, __$ref) {
         var __$t = !$$elem;
         if (__$t) {
             if ($$mods && $$mods["disabled"] === true && (__$ctx.__$a0 & 16) === 0) {
-                var __$r = __$ctx.extend(function __$lb__$15() {
-                    var __$r__$16;
-                    var __$l0__$17 = __$ctx.__$a0;
+                var __$r = __$ctx.extend(function __$lb__$13() {
+                    var __$r__$14;
+                    var __$l0__$15 = __$ctx.__$a0;
                     __$ctx.__$a0 = __$ctx.__$a0 | 16;
-                    __$r__$16 = applyc(__$ctx, __$ref);
-                    __$ctx.__$a0 = __$l0__$17;
-                    return __$r__$16;
+                    __$r__$14 = applyc(__$ctx, __$ref);
+                    __$ctx.__$a0 = __$l0__$15;
+                    return __$r__$14;
                 }(), {
                     url: __$ctx.ctx.url
                 });
@@ -14514,13 +14521,13 @@ function __$g0(__$ctx, __$ref) {
         var __$t = !$$elem;
         if (__$t) {
             if ($$mods && $$mods["focused"] === true && (__$ctx.__$a0 & 512) === 0) {
-                var __$r = __$ctx.extend(function __$lb__$62() {
-                    var __$r__$63;
-                    var __$l0__$64 = __$ctx.__$a0;
+                var __$r = __$ctx.extend(function __$lb__$60() {
+                    var __$r__$61;
+                    var __$l0__$62 = __$ctx.__$a0;
                     __$ctx.__$a0 = __$ctx.__$a0 | 512;
-                    __$r__$63 = applyc(__$ctx, __$ref);
-                    __$ctx.__$a0 = __$l0__$64;
-                    return __$r__$63;
+                    __$r__$61 = applyc(__$ctx, __$ref);
+                    __$ctx.__$a0 = __$l0__$62;
+                    return __$r__$61;
                 }(), {
                     live: false
                 });
@@ -14637,13 +14644,13 @@ function __$g1(__$ctx, __$ref) {
         }
     } else if (__$t === "input") {
         if (!$$elem && $$mods && $$mods["type"] === "datepicker" && (__$ctx.__$a0 & 2) === 0) {
-            return [ function __$lb__$6() {
-                var __$r__$7;
-                var __$l0__$8 = __$ctx.__$a0;
+            return [ function __$lb__$4() {
+                var __$r__$5;
+                var __$l0__$6 = __$ctx.__$a0;
                 __$ctx.__$a0 = __$ctx.__$a0 | 2;
-                __$r__$7 = applyc(__$ctx, __$ref);
-                __$ctx.__$a0 = __$l0__$8;
-                return __$r__$7;
+                __$r__$5 = applyc(__$ctx, __$ref);
+                __$ctx.__$a0 = __$l0__$6;
+                return __$r__$5;
             }(), {
                 block: "popup",
                 mods: {
@@ -14675,13 +14682,13 @@ function __$g1(__$ctx, __$ref) {
             return [ {
                 elem: "control",
                 val: __$ctx._checkedOptions[0].val
-            }, function __$lb__$9() {
-                var __$r__$10;
-                var __$l0__$11 = __$ctx.__$a0;
+            }, function __$lb__$7() {
+                var __$r__$8;
+                var __$l0__$9 = __$ctx.__$a0;
                 __$ctx.__$a0 = __$ctx.__$a0 | 4;
-                __$r__$10 = applyc(__$ctx, __$ref);
-                __$ctx.__$a0 = __$l0__$11;
-                return __$r__$10;
+                __$r__$8 = applyc(__$ctx, __$ref);
+                __$ctx.__$a0 = __$l0__$9;
+                return __$r__$8;
             }() ];
         }
         if ($$elem === "button" && $$mods && $$mods["mode"] === "radio-check") {
@@ -14717,10 +14724,52 @@ function __$g1(__$ctx, __$ref) {
             var __$r = __$b32(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
+    } else if (__$t === "field") {
+        if (!$$elem) {
+            return [ {
+                elem: "label",
+                content: "Repository link:"
+            }, {
+                block: "control-group",
+                mods: {
+                    flex: true
+                },
+                content: [ {
+                    block: "input",
+                    mods: {
+                        theme: "islands",
+                        size: "l",
+                        width: "available",
+                        "has-clear": true
+                    },
+                    name: "repositories",
+                    val: __$ctx.ctx.value,
+                    placeholder: __$ctx.ctx.first ? "organization/one-more-repo" : "organization/repo",
+                    tabIndex: __$ctx.ctx.index
+                }, {
+                    block: "button",
+                    mods: {
+                        theme: "islands",
+                        size: "l"
+                    },
+                    mix: {
+                        block: "field",
+                        elem: "remove"
+                    },
+                    icon: {
+                        block: "fa",
+                        mix: {
+                            block: "icon"
+                        },
+                        icon: "remove"
+                    }
+                } ]
+            } ];
+        }
     } else if (__$t === "issues-grid") {
         var __$t = $$elem;
         if (__$t === "type") {
-            var __$r = __$b33(__$ctx, __$ref);
+            var __$r = __$b34(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         } else if (__$t === "user") {
             return [ {
@@ -14919,7 +14968,7 @@ function __$g1(__$ctx, __$ref) {
                 elem: "grid"
             } ];
         } else if (__$t === "grid-body") {
-            var __$r = __$b45(__$ctx, __$ref);
+            var __$r = __$b46(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         } else if (__$t === "grid-head") {
             return {
@@ -14938,16 +14987,16 @@ function __$g1(__$ctx, __$ref) {
                 elem: "grid-body"
             } ];
         } else if (__$t === "month-select") {
-            var __$r = __$b48(__$ctx, __$ref);
+            var __$r = __$b49(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
         if (!$$elem) {
-            var __$r = __$b49(__$ctx, __$ref);
+            var __$r = __$b50(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     } else if (__$t === "checkbox") {
         if (!$$elem) {
-            var __$r = __$b50(__$ctx, __$ref);
+            var __$r = __$b51(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     } else if (__$t === "menu") {
@@ -14955,13 +15004,13 @@ function __$g1(__$ctx, __$ref) {
             return [ {
                 elem: "group-title",
                 content: __$ctx.ctx.title
-            }, function __$lb__$56() {
-                var __$r__$57;
-                var __$l0__$58 = __$ctx.__$a0;
+            }, function __$lb__$54() {
+                var __$r__$55;
+                var __$l0__$56 = __$ctx.__$a0;
                 __$ctx.__$a0 = __$ctx.__$a0 | 128;
-                __$r__$57 = applyc(__$ctx, __$ref);
-                __$ctx.__$a0 = __$l0__$58;
-                return __$r__$57;
+                __$r__$55 = applyc(__$ctx, __$ref);
+                __$ctx.__$a0 = __$l0__$56;
+                return __$r__$55;
             }() ];
         }
     } else if (__$t === "filter") {
@@ -15030,11 +15079,11 @@ function __$g1(__$ctx, __$ref) {
                 text: "Issues"
             };
         } else if (__$t === "repo-select") {
-            var __$r = __$b57(__$ctx, __$ref);
+            var __$r = __$b58(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
         if (!$$elem) {
-            var __$r = __$b58(__$ctx, __$ref);
+            var __$r = __$b59(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     } else if (__$t === "perdula") {
@@ -15055,7 +15104,7 @@ function __$g1(__$ctx, __$ref) {
         }
     } else if (__$t === "fa") {
         if (!$$elem) {
-            var __$r = __$b61(__$ctx, __$ref);
+            var __$r = __$b62(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     }
@@ -15069,19 +15118,19 @@ function __$g2(__$ctx, __$ref) {
         var __$t = $$elem;
         if (__$t === "control") {
             if ($$mods && $$mods["type"] === "datepicker" && (__$ctx.__$a0 & 1) === 0) {
-                var __$r = __$ctx.extend(function __$lb__$3() {
-                    var __$r__$4;
-                    var __$l0__$5 = __$ctx.__$a0;
+                var __$r = __$ctx.extend(function __$lb__$1() {
+                    var __$r__$2;
+                    var __$l0__$3 = __$ctx.__$a0;
                     __$ctx.__$a0 = __$ctx.__$a0 | 1;
-                    __$r__$4 = applyc(__$ctx, __$ref);
-                    __$ctx.__$a0 = __$l0__$5;
-                    return __$r__$4;
+                    __$r__$2 = applyc(__$ctx, __$ref);
+                    __$ctx.__$a0 = __$l0__$3;
+                    return __$r__$2;
                 }(), {
                     readonly: "readonly"
                 });
                 if (__$r !== __$ref) return __$r;
             }
-            var __$r = __$b64(__$ctx, __$ref);
+            var __$r = __$b65(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     } else if (__$t === "select") {
@@ -15097,15 +15146,15 @@ function __$g2(__$ctx, __$ref) {
         var __$t = !$$elem;
         if (__$t) {
             if ((!$$mods.type || $$mods.type === "submit") && (__$ctx.__$a0 & 16384) === 0) {
-                var __$r = __$b66(__$ctx, __$ref);
+                var __$r = __$b67(__$ctx, __$ref);
                 if (__$r !== __$ref) return __$r;
             }
-            var __$r = __$b67(__$ctx, __$ref);
+            var __$r = __$b68(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     } else if (__$t === "link") {
         if (!$$elem) {
-            var __$r = __$b68(__$ctx, __$ref);
+            var __$r = __$b69(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     } else if (__$t === "issues-grid") {
@@ -15121,7 +15170,7 @@ function __$g2(__$ctx, __$ref) {
         }
     } else if (__$t === "checkbox") {
         if ($$elem === "control") {
-            var __$r = __$b71(__$ctx, __$ref);
+            var __$r = __$b72(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     } else if (__$t === "menu") {
@@ -15132,13 +15181,13 @@ function __$g2(__$ctx, __$ref) {
             };
         } else if (__$t === "group") {
             if (typeof __$ctx.ctx.title !== "undefined" && (__$ctx.__$a0 & 256) === 0) {
-                var __$r = __$ctx.extend(function __$lb__$59() {
-                    var __$r__$60;
-                    var __$l0__$61 = __$ctx.__$a0;
+                var __$r = __$ctx.extend(function __$lb__$57() {
+                    var __$r__$58;
+                    var __$l0__$59 = __$ctx.__$a0;
                     __$ctx.__$a0 = __$ctx.__$a0 | 256;
-                    __$r__$60 = applyc(__$ctx, __$ref);
-                    __$ctx.__$a0 = __$l0__$61;
-                    return __$r__$60;
+                    __$r__$58 = applyc(__$ctx, __$ref);
+                    __$ctx.__$a0 = __$l0__$59;
+                    return __$r__$58;
                 }(), {
                     "aria-label": __$ctx.ctx.title
                 });
@@ -15149,7 +15198,7 @@ function __$g2(__$ctx, __$ref) {
             };
         }
         if (!$$elem) {
-            var __$r = __$b75(__$ctx, __$ref);
+            var __$r = __$b76(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     } else if (__$t === "menu-item") {
@@ -15162,7 +15211,7 @@ function __$g2(__$ctx, __$ref) {
         var __$t = !$$elem;
         if (__$t) {
             if (typeof __$ctx.ctx.content === "undefined" && (__$ctx.__$a0 & 1048576) === 0) {
-                var __$r = __$b77(__$ctx, __$ref);
+                var __$r = __$b78(__$ctx, __$ref);
                 if (__$r !== __$ref) return __$r;
             }
             return {
@@ -15171,12 +15220,12 @@ function __$g2(__$ctx, __$ref) {
         }
     } else if (__$t === "fa") {
         if (!$$elem) {
-            var __$r = __$b79(__$ctx, __$ref);
+            var __$r = __$b80(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     } else if (__$t === "icon") {
         if (!$$elem) {
-            var __$r = __$b80(__$ctx, __$ref);
+            var __$r = __$b81(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     }
@@ -15291,53 +15340,53 @@ function __$g4(__$ctx, __$ref) {
     var __$t = $$block;
     if (__$t === "input") {
         if (!$$elem && (__$ctx.__$a0 & 262144) === 0) {
-            var __$r = __$b122(__$ctx, __$ref);
+            var __$r = __$b124(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     } else if (__$t === "select") {
         var __$t = $$elem;
         if (__$t === "button") {
             if ((__$ctx.__$a0 & 32768) === 0) {
-                var __$r = __$b123(__$ctx, __$ref);
+                var __$r = __$b125(__$ctx, __$ref);
                 if (__$r !== __$ref) return __$r;
             }
         } else if (__$t === "menu") {
             if ((__$ctx.__$a0 & 4096) === 0) {
-                var __$r = __$b124(__$ctx, __$ref);
+                var __$r = __$b126(__$ctx, __$ref);
                 if (__$r !== __$ref) return __$r;
             }
         }
         if (!$$elem && !__$ctx._select && (__$ctx.__$a0 & 131072) === 0) {
-            var __$r = __$b125(__$ctx, __$ref);
+            var __$r = __$b127(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     } else if (__$t === "link") {
         if (!$$elem && (__$ctx.__$a0 & 32) === 0) {
-            var __$r = __$b126(__$ctx, __$ref);
+            var __$r = __$b128(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     } else if (__$t === "calendar") {
         if ($$elem === "content" && (__$ctx.__$a0 & 64) === 0) {
-            var __$r = __$b127(__$ctx, __$ref);
+            var __$r = __$b129(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     } else if (__$t === "menu") {
         if (!$$elem && (__$ctx.__$a0 & 2048) === 0) {
-            var __$r = __$b128(__$ctx, __$ref);
+            var __$r = __$b130(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     } else if (__$t === "menu-item") {
         if (!$$elem && __$ctx._menuMods && (__$ctx.__$a0 & 1024) === 0) {
-            var __$r = __$b129(__$ctx, __$ref);
+            var __$r = __$b131(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     } else if (__$t === "perdula") {
         if (!$$elem && !__$ctx.ctx._wrapped && (__$ctx.__$a0 & 524288) === 0) {
-            var __$r = __$b130(__$ctx, __$ref);
+            var __$r = __$b132(__$ctx, __$ref);
             if (__$r !== __$ref) return __$r;
         }
     }
-    var __$r = __$b131(__$ctx, __$ref);
+    var __$r = __$b133(__$ctx, __$ref);
     if (__$r !== __$ref) return __$r;
     return __$ref;
 };
