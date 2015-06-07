@@ -11,26 +11,26 @@ block('issues-grid').content()(function() {
             elem: 'row',
             content: [{
                 elem: 'cell',
-                elemMods: { header: true },
+                elemMods: {header: true},
                 content: 'PR'
             }, {
                 elem: 'cell',
-                elemMods: { header: true, sorter: true },
+                elemMods: {header: true, sorter: true},
                 key: 'issue',
                 content: 'Issue'
             }, {
                 elem: 'cell',
                 key: 'title',
-                elemMods: { header: true, sorter: true },
+                elemMods: {header: true, sorter: true},
                 content: 'Title'
             }, {
                 elem: 'cell',
-                elemMods: { header: true },
+                elemMods: {header: true},
                 content: 'Labels'
             }, {
                 elem: 'cell',
                 key: 'activity',
-                elemMods: { header: true, sorter: true },
+                elemMods: {header: true, sorter: true},
                 content: 'Last activity'
             }]
         }
@@ -55,7 +55,7 @@ block('issues-grid').elem('cell').elemMod('header', true).elemMod('sorter', true
     }, {
         elem: 'sorter',
         tag: 'span',
-        attrs: { 'data-key': this.ctx.key },
+        attrs: {'data-key': this.ctx.key},
         content: {
             block: 'fa',
             icon: 'angle-down'
@@ -65,31 +65,31 @@ block('issues-grid').elem('cell').elemMod('header', true).elemMod('sorter', true
 
 block('issues-grid').elem('issue-row')(
     attrs()(function() {
-        return { 'data-issue': this.ctx.issue.id }
+        return {'data-issue': this.ctx.issue.id}
     }),
     content()(function() {
         return [{
             elem: 'pr-cell',
-            mix: { elem: 'cell' },
+            mix: {elem: 'cell'},
             isPullRequest: this.ctx.issue.isPullRequest
         }, {
             elem: 'issue-cell',
-            mix: { elem: 'cell' },
+            mix: {elem: 'cell'},
             url: this.ctx.issue.url,
             organization: this.ctx.issue.organization,
             repository: this.ctx.issue.repository,
             id: this.ctx.issue.id
         }, {
             elem: 'title-cell',
-            mix: { elem: 'cell' },
+            mix: {elem: 'cell'},
             title: this.ctx.issue.title
         }, {
             elem: 'labels-cell',
-            mix: { elem: 'cell' },
+            mix: {elem: 'cell'},
             labels: this.ctx.issue.labels
         }, {
             elem: 'comment-cell',
-            mix: { elem: 'cell' },
+            mix: {elem: 'cell'},
             lastActivity: this.ctx.issue.lastActivity
         }];
     }));
@@ -108,7 +108,7 @@ block('issues-grid').elem('pr-cell')(
 block('issues-grid').elem('issue-cell').content()(function() {
     return {
         block: 'link',
-        mods: { theme: 'islands', size: 's' },
+        mods: {theme: 'islands', size: 's'},
         url: this.ctx.url,
         target: '_blank',
         content: this.ctx.organization + '/' + this.ctx.repository + '#' + this.ctx.id
@@ -143,7 +143,7 @@ block('issues-grid').elem('comment-cell').match(function() {
         type: this.ctx.lastActivity.type
     }, {
         block: 'link',
-        mods: { theme: 'islands', size: 's' },
+        mods: {theme: 'islands', size: 's'},
         url: this.ctx.lastActivity.issueUrl,
         content: {
             elem: 'date',
@@ -160,7 +160,7 @@ block('issues-grid').elem('comment-cell').match(function() {
 block('issues-grid').elem('label')(
     tag()('span'),
     attrs()(function() {
-        return { style: 'background-color: #' + this.ctx.label.color + ';' }
+        return {style: 'background-color: #' + this.ctx.label.color + ';'}
     }),
     content()(function() {
         return this.ctx.label.name;
@@ -176,15 +176,13 @@ block('issues-grid').elem('user')(
             width: 24,
             height: 24
         }, {
-            elem: 'login',
-            tag: 'span',
-            content: {
-                block: 'link',
-                mods: { theme: 'islands', size: 's' },
-                url: this.ctx.url,
-                content: this.ctx.login
-            }
-        }]
+            block: this.ctx.url ? 'link' : 'text',
+            tag: this.ctx.url ? 'a' : 'span',
+            mods: {theme: 'islands', size: 's'},
+            mix: {block: 'issues-grid', elem: 'login'},
+            url: this.ctx.url,
+            content: this.ctx.login
+        }];
     })
 );
 
@@ -206,6 +204,6 @@ block('issues-grid').elem('type')(
                 message = 'make pull request';
                 break;
         }
-        return message ? ' ' + message + ' ' : ''
+        return message ? ' ' + message + ' ' : '';
     })
 );

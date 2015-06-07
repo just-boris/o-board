@@ -153,7 +153,7 @@ modules.define('github__backend', function(provide, backend) {
                 "body": "my comment"
             }, {
                 "issue_url": "https://api.github.com/repos/my-org/extras/issues/23",
-                "user": {"login": "baev", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3"},
+                "user": {"login": "baev", "avatar_url": "https://avatars.githubusercontent.com/u/5477035?v=3", "html_url": "https://github.com/baev"},
                 "updated_at": "2014-04-08T5:50:58Z",
                 "body": "twenty-three"
             }],
@@ -195,16 +195,12 @@ modules.define('github__backend', function(provide, backend) {
             'my-org/extras/20': [{
                 "commit": {
                     "author": {
-                        "date": "2014-08-31T02:15:53Z"
+                        "date": "2014-08-31T02:15:53Z",
+                        "name": "alkedr"
                     },
-                    "message": "bugfix: exception is now displayed in last failed step when there are multiple failed steps",
+                    "message": "bugfix: exception is now displayed in last failed step when there are multiple failed steps"
                 },
-                "html_url": "https://github.com/allure-framework/allure-core/commit/930be59274ca7773df62ee55d6e709b0161b78f6",
-                "author": {
-                    "login": "alkedr",
-                    "avatar_url": "https://avatars.githubusercontent.com/u/2046080?v=3",
-                    "html_url": "https://github.com/alkedr"
-                }
+                "html_url": "https://github.com/allure-framework/allure-core/commit/930be59274ca7773df62ee55d6e709b0161b78f6"
             }]
         };
         return Promise.resolve(pullRequests[[issue.organization, issue.repository, issue.id].join('/')] || []);

@@ -35,6 +35,19 @@ modules.define('github', ['github__backend'], function(provide, backend) {
     function flatten(array) {
         return Array.prototype.concat.apply([], array);
     }
+    function getCommitAuthor(commit) {
+        if(commit.author) {
+            return {
+                login: commit.author.login,
+                avatarUrl: commit.author.avatar_url,
+                url: commit.author.html_url
+            };
+        } else {
+            return {
+                login: commit.commit.author.name
+            };
+        }
+    }
     function lastCommentActivity(issue) {
         if(issue.comment) {
             issue.lastActivity = issue.comment;
@@ -59,11 +72,7 @@ modules.define('github', ['github__backend'], function(provide, backend) {
                         issue.lastActivity = {
                             type: 'commit',
                             issueUrl: lastCommit.html_url,
-                            author: {
-                                login: lastCommit.author.login,
-                                avatarUrl: lastCommit.author.avatar_url,
-                                url: lastCommit.author.html_url
-                            },
+                            author: getCommitAuthor(lastCommit),
                             date: commitDate
                         };
                     }
