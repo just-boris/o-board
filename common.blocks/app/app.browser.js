@@ -17,8 +17,6 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
             state: {
                 config: function () {
                     this._buildConfigView();
-                    this._getFormConfig().on('submit', this._onFormConfigSubmit, this);
-                    this._getBtnConfigClear().on('click', this._onClickBtnConfigClear, this);
                 },
 
                 loading: function () {
@@ -154,15 +152,11 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
         _onClickLinkChangeConfig: function () {
             this._clearCacheConfigBlocks();
             this.setMod('state', 'config');
-            this._clearConfig();
         },
 
         _onClickBtnConfigClear: function () {
-            this._getBtnConfigClear().un('click', this._onClickBtnConfigClear, this);
-            this._clearCacheConfigBlocks();
+            this._clearConfig();
             this._buildConfigView();
-            this._getFormConfig().on('submit', this._onFormConfigSubmit, this);
-            this._getBtnConfigClear().on('click', this._onClickBtnConfigClear, this);
         },
 
         _clearConfig: function () {
@@ -178,6 +172,9 @@ modules.define('app', ['i-bem__dom', 'BEMHTML', 'github'], function (provide, BE
             };
 
             this._showContent(bemjson);
+
+            this._getFormConfig().on('submit', this._onFormConfigSubmit, this);
+            this._getBtnConfigClear().on('click', this._onClickBtnConfigClear, this);
         },
 
         _getContent: function () {
