@@ -35,7 +35,9 @@
   "scripts": {
     "start": "enb server",
     "postinstall": "bower-npm-install",
-    "deps": "bower-npm-install --non-interactive"
+    "deps": "bower-npm-install --non-interactive",
+    "test": "enb make && enb make specs",
+    "build": "YENV=production enb make && cp desktop.bundles/index/** pages/"
   },
   "private": true
 }

@@ -15,3 +15,6 @@ npm-debug.log
 *pages*/*/*.*
 !*pages*/*/*.bemjson.js
 !*pages*/.bem/*
+
+desktop.specs/
+pages/
